@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /tenants/{tenantId} {
+      // Anyone can read tenant info for login
+      allow read: if true;
+      // Only admin can write
+      allow write: if false;
+    }
+
+    match /users/{userId} {
+      // Users can only access their own document within their tenant
+      allow read: if request.auth != null &&
+                 request.auth.uid == userId &&
+                 resource.data.tenantId == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.tenantId;
+    }
+  }
+}

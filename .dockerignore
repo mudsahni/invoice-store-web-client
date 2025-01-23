@@ -1,0 +1,10 @@
+.env*
+secrets/
+.idea
+Dockerfile
+.next
+.git
+README.md
+node_modules/
+scripts/
+.gitignore
