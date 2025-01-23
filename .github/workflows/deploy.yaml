@@ -77,9 +77,5 @@ jobs:
             --memory=1Gi
             --cpu=1
             --timeout=300
-            --startup-cpu-boost
+            --cpu-boost
             --execution-environment=gen2
-            --cpu-throttling
-            --startup-probe-period=10s
-            --startup-probe-timeout=5s
-            --startup-probe-threshold=10
