@@ -32,6 +32,10 @@ jobs:
         run: |
           gcloud secrets versions access latest --project="${{ env.PROJECT_ID }}" --secret="firebase-sa-key" > firebase-sa-key.json
 
+      - name: Authenticate Docker to Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-south2-docker.pkg.dev
+
       - name: Configure Docker
         run: gcloud auth configure-docker
 
