@@ -139,7 +139,7 @@ export default function DashboardPage() {
 
     React.useEffect(() => {
         fetchAndCacheJobs();
-    }, [fetchAndCacheJobs]);
+    }, []);
 
     return (
         <ProtectedRoute>
