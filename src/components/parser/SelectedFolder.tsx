@@ -1,18 +1,19 @@
-import {FileText, Loader2, Upload} from "lucide-react";
+import {FileText} from "lucide-react";
 import React from "react";
 import {useNewCollectionContext} from "@/components/parser/context/NewCollectionContext";
-import {Button} from "@/components/ui/button";
 import {Checkbox} from "@/components/ui/checkbox";
 
 interface SelectedFolderProps {
     fileInputRef: React.RefObject<HTMLInputElement>;
     handleFolderSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
-export const SelectedFolder: React.FC<SelectedFolderProps> = ({fileInputRef, handleFolderSelect}) => {
+export const SelectedFolder: React.FC<SelectedFolderProps> = ({
+                                                                  fileInputRef,
+                                                                  handleFolderSelect
+}) => {
     const {
         pdfFiles,
         setPdfFiles,
-        isProcessing
     } = useNewCollectionContext();
 
     const selectedCount = pdfFiles.filter(file => file.selected).length;
@@ -25,7 +26,7 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({fileInputRef, han
         );
     };
 
-    const handleSelections = (id?: string) => {
+    const handleSelections = () => {
         if (selectedCount === pdfFiles.length) {
             setPdfFiles(prevFiles =>
                 prevFiles.map(file => ({ ...file, selected: false }))
@@ -36,21 +37,21 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({fileInputRef, han
             )
         }
     }
-    const handleSelectAll = () => {
-        setPdfFiles(prevFiles =>
-            prevFiles.map(file => ({ ...file, selected: true }))
-        );
-    };
-
-    const handleDeselectAll = () => {
-        setPdfFiles(prevFiles =>
-            prevFiles.map(file => ({ ...file, selected: false }))
-        );
-    };
-
-    const handleBrowseClick = () => {
-        fileInputRef.current?.click();
-    };
+    // const handleSelectAll = () => {
+    //     setPdfFiles(prevFiles =>
+    //         prevFiles.map(file => ({ ...file, selected: true }))
+    //     );
+    // };
+    //
+    // const handleDeselectAll = () => {
+    //     setPdfFiles(prevFiles =>
+    //         prevFiles.map(file => ({ ...file, selected: false }))
+    //     );
+    // };
+    //
+    // const handleBrowseClick = () => {
+    //     fileInputRef.current?.click();
+    // };
 
 
     return (

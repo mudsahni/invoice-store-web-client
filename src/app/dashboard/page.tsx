@@ -1,6 +1,5 @@
 'use client';
 
-import {useAuth} from "@/contexts/AuthContext";
 import {Table} from "@/components/ui/datatable/table";
 import React, {useState} from "react";
 import {RefreshCw} from "lucide-react";
@@ -9,26 +8,6 @@ import {StatusType} from "@/components/ui/status";
 import {CreateNewCollection} from "@/components/parser/CreateNewCollection";
 import Steps from "@/components/Steps";
 import ProtectedRoute from "@/contexts/ProtectedRoute";
-
-// LoadingSkeleton component
-const LoadingSkeleton = () => {
-    return (
-        <div className="w-full py-4 animate-pulse">
-            <div className="grid gap-4">
-
-                {/* Table rows skeleton */}
-                {[1,2].map((i) => (
-                    <div key={i} className="grid grid-cols-1 gap-4">
-                        {/* Adjust grid-cols to match your table columns */}
-                        <div className="h-8 bg-gray-200 rounded-md" />
-                        <div className="h-8 bg-gray-200 rounded-md" />
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-};
-
 
 interface Job {
     collection_id: string,
@@ -120,8 +99,6 @@ export default function DashboardPage() {
     const [error, setError] = useState<string | null>(null);
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-    const {authUser, tenant, loading} = useAuth();
-
     const URI = `http://localhost:8080/api/v1/invoice-reader/collections?status=completed`
     const fetchAndCacheJobs = async (forceRefresh: boolean = false) => {
         try {
@@ -162,7 +139,7 @@ export default function DashboardPage() {
 
     React.useEffect(() => {
         fetchAndCacheJobs();
-    }, []);
+    }, [fetchAndCacheJobs]);
 
     return (
         <ProtectedRoute>
@@ -177,7 +154,7 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-gray-800 dark:text-gray-100 py-4 text-base tracking-wide">
                         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
-                        the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley
+                        the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley
                         of type and scrambled it to make a type specimen book. It has survived not only five centuries,
                         but also the leap into electronic typesetting, remaining essentially unchanged. It was
                         popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
@@ -190,7 +167,7 @@ export default function DashboardPage() {
                     </div>
                     <p className="text-gray-800 dark:text-gray-100 pb-4 text-base tracking-wide">
                         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been
-                        the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley
+                        the industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley
                         of type and scrambled it to make a type specimen book. It has survived not only five centuries,
                         but also the leap into electronic typesetting, remaining essentially unchanged. It was
                         popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
@@ -221,8 +198,12 @@ export default function DashboardPage() {
                 </div>
                 <p className="text-slate-600">
                     Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the
-                    industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type
-                    and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                    industry&apos;s standard dummy text ever since the 1500s, when an unknown printer took a galley of type
+                    and scrambled it to make a type specimen book. It has survived not only five centuries,
+                    but also the leap into electronic typesetting, remaining essentially unchanged.
+                    It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+                    and more recently with desktop publishing software like Aldus PageMaker including versions of
+                    Lorem Ipsum.
                 </p>
                 <div className="flex items-end justify-end gap-4">
                     {lastUpdated && (

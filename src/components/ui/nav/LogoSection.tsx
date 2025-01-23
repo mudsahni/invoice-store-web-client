@@ -1,5 +1,4 @@
 import {APPLICATION_NAME} from "@/constants/app";
-import {APPLICATION_NAME_TEXT_COLOR} from "@/components/ui/nav/colors";
 import React from "react";
 import Link from "next/link";
 

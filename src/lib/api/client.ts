@@ -13,9 +13,9 @@ interface ApiError extends Error {
 }
 
 export class ApiClient {
-    private baseUrlPrefix: string;
-    private baseUrlSuffix?: string;
-    private timeout: number;
+    private readonly baseUrlPrefix: string;
+    private readonly baseUrlSuffix?: string;
+    private readonly timeout: number;
 
     constructor(options: ApiClientOptions) {
         this.baseUrlPrefix = options.baseUrlPrefix;
@@ -69,11 +69,10 @@ export class ApiClient {
         const timeoutId = setTimeout(() => controller.abort(), this.timeout);
 
         try {
-            const response = await fetch(url, {
+            return await fetch(url, {
                 ...options,
                 signal: controller.signal,
             });
-            return response;
         } finally {
             clearTimeout(timeoutId);
         }

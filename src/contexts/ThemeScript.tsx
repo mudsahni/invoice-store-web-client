@@ -4,8 +4,7 @@ import { useEffect } from 'react'
 
 export function ThemeScript() {
     useEffect(() => {
-        const theme = localStorage.getItem('theme') || 'dark'
-        document.documentElement.className = theme
+        document.documentElement.className = localStorage.getItem('theme') || 'dark'
     }, [])
 
     return null

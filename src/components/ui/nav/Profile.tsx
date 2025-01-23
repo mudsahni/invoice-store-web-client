@@ -69,10 +69,10 @@ interface ProfileDropDownProps {
     user: UserData | null,
 }
 
-export const ProfileDropdown: React.FC<ProfileDropDownProps> = ({mobile, user}) => {
+export const ProfileDropdown: React.FC<ProfileDropDownProps> = ({mobile}) => {
 
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
+    const [, setError] = useState('');
+    const [, setIsLoading] = useState(false);
 
     const {signOut} = useAuth()
 

@@ -6,7 +6,7 @@ import { LoginForm } from '@/components/ui/LoginForm';
 import {useAuth} from "@/contexts/AuthContext";
 
 export default function LoginPage() {
-    const { tenant, signIn, authUser, loading: authLoading } = useAuth();
+    const {authUser, loading: authLoading } = useAuth();
 
     const [step, setStep] = useState<'org' | 'login'>('org');
 

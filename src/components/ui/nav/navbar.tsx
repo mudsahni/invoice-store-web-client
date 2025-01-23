@@ -9,10 +9,10 @@ import {NAVIGATION_ITEMS} from "@/components/ui/nav/navigationItems";
 const Navigation = () => {
 
     const pathname: string = usePathname();
-    const {authUser, tenant, loading} = useAuth();
+    const {authUser} = useAuth();
 
     // Function to check if link is active
-    const isActive = (path: string) => pathname === path;
+    // const isActive = (path: string) => pathname === path;
 
     return (
         <Disclosure as="nav" className='dark:bg-black-800'>

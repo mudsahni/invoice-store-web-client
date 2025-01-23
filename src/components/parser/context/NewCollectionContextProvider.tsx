@@ -1,4 +1,4 @@
-import React, {createContext, ReactNode, useContext, useState} from "react";
+import React, {ReactNode, useState} from "react";
 import {PDFFile, ProcessedData} from "@/components/parser/PDFFile";
 import { NewCollectionContext } from "./NewCollectionContext";
 

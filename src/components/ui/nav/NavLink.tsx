@@ -1,10 +1,4 @@
 import React from "react";
-import {
-    HIGHLIGHTED_BACKGROUND_COLOR,
-    HIGHLIGHTED_TEXT_COLOR,
-    HOVER_BACKGROUND_COLOR,
-    TEXT_COLOR
-} from "@/components/ui/nav/colors";
 import {DisclosureButton} from "@headlessui/react";
 import Link from "next/link";
 

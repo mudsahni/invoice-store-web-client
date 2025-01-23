@@ -43,7 +43,7 @@ const getErrorMessage = (errorCode: string) => {
 };
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
+    const [, setUser] = useState<User | null>(null);
     const [authUser, setAuthUser] = useState<UserData | null>(null);
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [loading, setLoading] = useState(true);
@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setAuthUser(null);
                     setTenant(null);
 
-                    // If no user or tenant, and we're not on login page, redirect to login
+                    // If no user or tenant, and we're not on login page, redirect to login page
                     if (window.location.pathname !== '/login') {
                         router.push('/login');
                     }

@@ -1,5 +1,4 @@
-import React, {useState} from "react";
-import {ValidatedInput} from "@/components/ui/ValidatedInput";
+import React from "react";
 import {FolderSelection} from "@/components/parser/FolderSelection";
 import {SelectedFolder} from "@/components/parser/SelectedFolder";
 import {useNewCollectionContext} from "@/components/parser/context/NewCollectionContext";
@@ -33,10 +32,10 @@ export const NewCollectionTool = () => {
         savedTenantJson = JSON.parse(savedTenant)
     }
     const fileInputRef = React.createRef<HTMLInputElement>();
-    const [isCollectionNameValid, setIsCollectionNameValid] = React.useState(false);
-    const [collectionStatus, setCollectionStatus] = React.useState<CollectionStatusEvent | null>(null);
+    const [, setIsCollectionNameValid] = React.useState(false);
+    const [, setCollectionStatus] = React.useState<CollectionStatusEvent | null>(null);
 
-    const {authUser, tenant, loading} = useAuth();
+    const {authUser, loading} = useAuth();
 
     const listenToCollectionStatusEvents = async (collectionId: string) => {
         // Start listening to events
@@ -73,7 +72,6 @@ export const NewCollectionTool = () => {
         setSuccess('');
 
         try {
-            const formData = new FormData();
             // Log the files we're about to send
             console.log('Selected files:', selectedFiles);
 
@@ -101,7 +99,7 @@ export const NewCollectionTool = () => {
             listenToCollectionStatusEvents(collectionCreationResponse.id);
 
             // create map of pdf files with name and file value from selected file
-            let selectedFileMap: {[key:string]: File} = {}
+            const selectedFileMap: {[key:string]: File} = {}
             selectedFiles.map(file => {
                 selectedFileMap[file.file.name] = file.file
             })
@@ -114,9 +112,9 @@ export const NewCollectionTool = () => {
                     const documentId = collectionCreationResponse.documents[key].documentId;
                     console.log('Signed URL data:', signedUrlData)
                     if (signedUrlData) {
-                        console.log('Uploading file:', fileName, signedUrlData);
+                        console.log('Uploading file:', fileName, documentId, signedUrlData);
                         await collectionsService.uploadFile(signedUrlData, selectedFileMap[fileName]);
-                        console.log('File uploaded:', fileName, signedUrlData);
+                        console.log('File uploaded:', fileName, documentId, signedUrlData);
                     }
                 })
             );

@@ -1,6 +1,5 @@
 import React from 'react'
 import {FolderOpen} from "lucide-react";
-import {useNewCollectionContext} from "@/components/parser/context/NewCollectionContext";
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends HTMLAttributes<T> {

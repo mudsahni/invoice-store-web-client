@@ -5,9 +5,9 @@ const pages = [
     { name: 'Project Nero', href: '#', current: true },
 ]
 
-interface BreadcrumbsProps {
-    pages: { name: string, href: string, current: boolean }[]
-}
+// interface BreadcrumbsProps {
+//     pages: { name: string, href: string, current: boolean }[]
+// }
 
 export const Breadcrumbs = () => {
     return (

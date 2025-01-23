@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {CheckCircleIcon, ExclamationCircleIcon} from "@heroicons/react/16/solid";
-import {Button} from "@/components/ui/button";
+import {ExclamationCircleIcon} from "@heroicons/react/16/solid";
 
 interface InputWithButtonProps {
     value: string
@@ -18,7 +17,6 @@ export const InputWithButton: React.FC<InputWithButtonProps> = (
             placeholder,
             buttonLabel,
             validate,
-            loading,
             handleSubmit
         }
     ) => {
