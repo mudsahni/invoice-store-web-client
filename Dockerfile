@@ -51,4 +51,9 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["npm", "run", "start"]
+RUN chown -R node:node .
+USER node
+
+EXPOSE 3000
+
+CMD ["node", "server.js"]
