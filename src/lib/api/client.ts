@@ -49,6 +49,8 @@ export class ApiClient {
     private async getHeaders(): Promise<HeadersInit> {
         const headers: HeadersInit = {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': 'https://invoice-store-front-end-741672280176.asia-south2.run.app',
+            'Access-Control-Allow-Credentials': 'true'
         };
 
         // Get fresh token
