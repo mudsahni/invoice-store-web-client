@@ -69,4 +69,17 @@ jobs:
           service: ${{ env.SERVICE_NAME }}
           image: asia-south2-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/app:${{ github.sha }}
           region: ${{ env.REGION }}
-          flags: --port=3000 --allow-unauthenticated
+          flags: |
+            --port=3000
+            --allow-unauthenticated
+            --min-instances=0
+            --max-instances=1
+            --memory=1Gi
+            --cpu=1
+            --timeout=300
+            --startup-cpu-boost
+            --execution-environment=gen2
+            --cpu-throttling
+            --startup-probe-period=10s
+            --startup-probe-timeout=5s
+            --startup-probe-threshold=10
