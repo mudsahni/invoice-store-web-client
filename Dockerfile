@@ -36,14 +36,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --from=builder /app/next.config.js ./
+COPY --from=builder /app/next.config.ts ./
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/tailwind.config.ts ./
-COPY --from=builder /app/postcss.config.js ./
+COPY --from=builder /app/postcss.config.ts ./
 COPY --from=builder /app/components.json ./
-COPY --from=builder /app/next.d.ts ./
+COPY --from=builder /app/next-env.d.ts ./
 COPY --from=builder /app/.firebaserc ./
 COPY --from=builder /app/firestore.rules ./
 COPY --from=builder /app/firebase.json ./
