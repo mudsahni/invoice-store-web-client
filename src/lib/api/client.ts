@@ -180,25 +180,57 @@ export class ApiClient {
     }
 
 
-    stream<T>(endpoint: string, onEvent: (event: T) => void): () => void {
-        const url = new URL(`${this.getBaseUrl()}${endpoint}`);
+    async stream<T>(endpoint: string, onEvent: (event: T) => void): Promise<() => void> {
+        const controller = new AbortController();
 
-        console.log('Stream URL:', url.toString());
-        const eventSource = new EventSource(url.toString());
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            onEvent(data);
+        const fetchAndStream = async () => {
+            try {
+                const headers = await this.getHeaders();
+                const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
+                    headers: {
+                        ...headers,
+                        'Accept': 'text/event-stream',
+                        'Cache-Control': 'no-cache',
+                        'Connection': 'keep-alive'
+                    },
+                    signal: controller.signal
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const reader = response.body!.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, {stream: true});
+                    const lines = buffer.split('\n');
+
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = JSON.parse(line.slice(6));
+                            onEvent(data);
+                        }
+                    }
+                }
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    console.error('Stream error:', error);
+                }
+            }
         };
 
-        eventSource.onerror = (error) => {
-            console.error('SSE Error:', error);
-            eventSource.close();
-        };
+        fetchAndStream();
 
-        // Return cleanup function
         return () => {
-            eventSource.close();
+            controller.abort();
         };
-    }
-}
+    }}
 
