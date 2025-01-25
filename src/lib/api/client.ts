@@ -118,16 +118,25 @@ export class ApiClient {
     }
 
     async post<T>(endpoint: string, data?: any): Promise<T> {
-        const response = await this.fetchWithTimeout(
-            `${this.getBaseUrl()}${endpoint}`,
-            {
-                method: 'POST',
-                headers: await this.getHeaders(),
-                body: data ? JSON.stringify(data) : undefined,
-            }
-        );
+        try {
+            const response = await this.fetchWithTimeout(
+                `${this.getBaseUrl()}${endpoint}`,
+                {
+                    method: 'POST',
+                    headers: await this.getHeaders(),
+                    body: data ? JSON.stringify(data) : undefined,
+                }
+            );
 
-        return this.handleResponse<T>(response);
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+
+            return this.handleResponse<T>(response);
+        } catch (error) {
+            console.error('Fetch error:', error);
+            throw error;
+
+        }
     }
 
     async put<T>(endpoint: string, data?: any): Promise<T> {
