@@ -183,6 +183,7 @@ export class ApiClient {
     stream<T>(endpoint: string, onEvent: (event: T) => void): () => void {
         const url = new URL(`${this.getBaseUrl()}${endpoint}`);
 
+        console.log('Stream URL:', url.toString());
         const eventSource = new EventSource(url.toString());
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
