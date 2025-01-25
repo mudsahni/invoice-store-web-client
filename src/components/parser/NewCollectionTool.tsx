@@ -96,7 +96,7 @@ export const NewCollectionTool = () => {
                 filesMap
             );
 
-            // listenToCollectionStatusEvents(collectionCreationResponse.id);
+            listenToCollectionStatusEvents(collectionCreationResponse.id);
             //
             // create map of pdf files with name and file value from selected file
             const selectedFileMap: {[key:string]: File} = {}
