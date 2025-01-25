@@ -1,5 +1,7 @@
 import { auth } from '@/lib/firebase';
 import {Tenant} from "@/types/auth";
+import {API_ENDPOINTS} from "@/lib/api/endpoints";
+import {CollectionStatusEvent} from "@/types/collections";
 
 interface ApiClientOptions {
     baseUrlPrefix: string;
@@ -175,6 +177,27 @@ export class ApiClient {
         );
 
         return this.handleResponse<T>(response);
+    }
+
+
+    stream<T>(endpoint: string, onEvent: (event: T) => void): () => void {
+        const url = new URL(`${this.getBaseUrl()}${endpoint}`);
+
+        const eventSource = new EventSource(url.toString());
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            onEvent(data);
+        };
+
+        eventSource.onerror = (error) => {
+            console.error('SSE Error:', error);
+            eventSource.close();
+        };
+
+        // Return cleanup function
+        return () => {
+            eventSource.close();
+        };
     }
 }
 

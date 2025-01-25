@@ -48,24 +48,7 @@ export class CollectionsService {
     }
 
     subscribeToCollectionEvents(collectionId: string, onEvent: (event: CollectionStatusEvent) => void): () => void {
-        const eventSource = new EventSource(
-            API_ENDPOINTS.COLLECTIONS.STREAM(collectionId)
-        );
-
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            onEvent(data);
-        };
-
-        eventSource.onerror = (error) => {
-            console.error('SSE Error:', error);
-            eventSource.close();
-        };
-
-        // Return cleanup function
-        return () => {
-            eventSource.close();
-        };
+        return apiClient.stream(API_ENDPOINTS.COLLECTIONS.STREAM(collectionId), onEvent);
     }
 
 }
