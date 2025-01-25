@@ -220,8 +220,8 @@ export class ApiClient {
                         }
                     }
                 }
-            } catch (error) {
-                if (error.name !== 'AbortError') {
+            } catch (error: unknown) {
+                if (error instanceof Error && error.name !== 'AbortError') {
                     console.error('Stream error:', error);
                 }
             }
@@ -232,5 +232,6 @@ export class ApiClient {
         return () => {
             controller.abort();
         };
-    }}
+    }
+}
 
