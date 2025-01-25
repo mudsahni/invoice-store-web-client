@@ -37,9 +37,10 @@ export const NewCollectionTool = () => {
 
     const {authUser, loading} = useAuth();
 
+
     const listenToCollectionStatusEvents = async (collectionId: string) => {
         // Start listening to events
-        const unsubscribe = collectionsService.subscribeToCollectionEvents(
+        const unsubscribe = await collectionsService.subscribeToCollectionEvents(
             collectionId,
             (event) => {
                 console.log('Received event:', event);
@@ -53,13 +54,12 @@ export const NewCollectionTool = () => {
         );
 
         // Clean up subscription when component unmounts
-        return () => {
-            unsubscribe();
-        };
-
+        return unsubscribe;
     }
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        let unsubscribe: (() => void) | undefined;
+
         const selectedFiles = pdfFiles.filter(file => file.selected);
 
         if (selectedFiles.length === 0) {
@@ -96,8 +96,9 @@ export const NewCollectionTool = () => {
                 filesMap
             );
 
-            listenToCollectionStatusEvents(collectionCreationResponse.id);
-            //
+            // Store the unsubscribe function
+            unsubscribe = await listenToCollectionStatusEvents(collectionCreationResponse.id);
+
             // create map of pdf files with name and file value from selected file
             const selectedFileMap: {[key:string]: File} = {}
             selectedFiles.map(file => {
@@ -135,6 +136,9 @@ export const NewCollectionTool = () => {
             setError(err instanceof Error ? err.message : 'Failed to process PDFs');
         } finally {
             setIsProcessing(false);
+            if (unsubscribe) {
+                unsubscribe();
+            }
         }
     };
 

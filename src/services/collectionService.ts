@@ -47,10 +47,16 @@ export class CollectionsService {
         }
     }
 
-    subscribeToCollectionEvents(collectionId: string, onEvent: (event: CollectionStatusEvent) => void): () => void {
-        return apiClient.stream(API_ENDPOINTS.COLLECTIONS.STREAM(collectionId), onEvent);
+    async subscribeToCollectionEvents(
+        collectionId: string,
+        onEvent: (event: CollectionStatusEvent) => void
+    ): Promise<() => void> {
+        const unsubscribe = await apiClient.stream(
+            API_ENDPOINTS.COLLECTIONS.STREAM(collectionId),
+            onEvent
+        );
+        return unsubscribe;
     }
-
 }
 
 export const collectionsService = new CollectionsService();
