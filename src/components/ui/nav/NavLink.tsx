@@ -17,8 +17,12 @@ export const NavLink: React.FC<NavLinkProps> = ({mobile, pathname, item}) => {
     //     ? `${HIGHLIGHTED_BACKGROUND_COLOR} ${HIGHLIGHTED_TEXT_COLOR}`
     //     : `${TEXT_COLOR} hover:${HOVER_BACKGROUND_COLOR} hover:${HIGHLIGHTED_TEXT_COLOR}`
 
-    const hoverStyles = "dark:hover:text-gray-300 transition-transform duration-100 dark:text-white hover:text-blue-600 tracking-wide"
-    const highlightLogic = pathname === item.href ? `dark:text-white font-semibold` : `font-medium ${hoverStyles}`
+
+    const mobileHoverStyles = "text-theme-bg transition-transform duration-100 tracking-wide opacity-80 hover:opacity-100"
+    const mobileHighlightLogic = pathname === item.href ? `text-theme-bg font-medium` : `font-medium ${mobileHoverStyles}`
+
+    const hoverStyles = "text-theme-text transition-transform duration-100 tracking-wide opacity-80 hover:opacity-100"
+    const highlightLogic = pathname === item.href ? `text-theme-text font-medium` : `font-medium ${hoverStyles}`
 
     return (
         mobile ? (
@@ -26,7 +30,7 @@ export const NavLink: React.FC<NavLinkProps> = ({mobile, pathname, item}) => {
                 key={item.href}
                 as={Link}
                 href={item.href}
-                className={`block ${commonStyles} ${highlightLogic}`}
+                className={`block ${commonStyles} ${mobileHighlightLogic}`}
             >
                 {item.name}
             </DisclosureButton>

@@ -28,13 +28,13 @@ const Checkbox: React.FC<CheckboxProps> = ({
             name={`file-${id}`}
             type="checkbox"
             aria-describedby="file-selection"
-            className={`${!selected && 'group-hover:bg-gray-300'} col-start-1 cursor-pointer row-start-1 appearance-none rounded bg-gray-200 border-[2px] border-gray-400 checked:border-green-700 checked:bg-green-700 indeterminate:border-gray-600 indeterminate:bg-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:checked:bg-gray-100 forced-colors:appearance-auto`}
+            className={`${!selected && 'group-hover:bg-theme-text group-hover:bg-opacity-20'} col-start-1 cursor-pointer row-start-1 appearance-none rounded bg-theme-text bg-opacity-[1%] border-[2px] border-theme-text border-opacity-40 checked:border-secondary-600 checked:bg-secondary-600 indeterminate:border-theme-text indeterminate:bg-theme-text focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-text disabled:border-theme-text disabled:bg-theme-text disabled:checked:bg-theme-text forced-colors:appearance-auto`}
 
         />
         <svg
             fill="none"
             viewBox="0 0 14 14"
-            className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-gray-950/25"
+            className="pointer-events-none col-start-1 row-start-1 size-3.5 self-center justify-self-center stroke-white group-has-[:disabled]:stroke-theme-text-950/25"
         >
           <path
               d="M3 8L6 11L11 3.5"

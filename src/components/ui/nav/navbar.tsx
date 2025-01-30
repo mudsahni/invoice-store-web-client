@@ -15,7 +15,7 @@ const Navigation = () => {
     // const isActive = (path: string) => pathname === path;
 
     return (
-        <Disclosure as="nav" className='dark:bg-black-800'>
+        <Disclosure as="nav">
                 <>
                     <WebNavigation navigation={NAVIGATION_ITEMS} pathname={pathname} user={authUser} />
                     <MobileNavigation navigation={NAVIGATION_ITEMS} pathname={pathname} user={authUser} />

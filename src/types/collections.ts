@@ -66,3 +66,16 @@ export interface CollectionStatusEvent {
     error: CollectionError | null;
     timestamp: string;
 }
+
+export interface GetCollectionResponse {
+    id: string;
+    name: string;
+    type: CollectionType;
+    documents: Record<string, DocumentStatus>;
+    createdAt: string;
+    updatedAt: string;
+    updatedBy: string;
+}
+export interface GetCollectionsResponse {
+    collections: GetCollectionResponse[];
+}

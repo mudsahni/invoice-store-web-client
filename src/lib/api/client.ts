@@ -185,7 +185,9 @@ export class ApiClient {
 
         const fetchAndStream = async () => {
             try {
+                console.log(`${new Date().toISOString()} Starting stream request to ${endpoint}`);
                 const headers = await this.getHeaders();
+
                 const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
                     headers: {
                         ...headers,
@@ -204,31 +206,70 @@ export class ApiClient {
                 const decoder = new TextDecoder();
                 let buffer = '';
 
-                while (true) {
-                    const {done, value} = await reader.read();
-                    if (done) break;
-
-                    buffer += decoder.decode(value, {stream: true});
+                const processBuffer = () => {
                     const lines = buffer.split('\n');
+                    buffer = lines.pop() || ''; // Keep the last incomplete line in the buffer
 
-                    buffer = lines.pop() || '';
+                    let currentEvent: { id?: string; event?: string; data?: string } = {};
 
                     for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            const data = JSON.parse(line.slice(6));
-                            onEvent(data);
+                        console.log('Processing line:', line); // Debug log
+
+                        if (line.startsWith('id:')) {
+                            currentEvent.id = line.slice(3).trim();
+                        } else if (line.startsWith('event:')) {
+                            currentEvent.event = line.slice(6).trim();
+                        } else if (line.startsWith('data:')) {
+                            currentEvent.data = line.slice(5).trim();
+
+                            // If we have data, try to process the complete event
+                            if (currentEvent.data) {
+                                try {
+                                    console.log('Parsing data:', currentEvent.data);
+                                    const data = JSON.parse(currentEvent.data);
+                                    console.log('Parsed event:', {
+                                        id: currentEvent.id,
+                                        event: currentEvent.event,
+                                        data
+                                    });
+                                    onEvent(data);
+                                } catch (e) {
+                                    console.error('Error parsing event data:', e);
+                                }
+                                // Reset for next event
+                                currentEvent = {};
+                            }
                         }
                     }
-                }
-            } catch (error: unknown) {
-                if (error instanceof Error && error.name !== 'AbortError') {
-                    console.error('Stream error:', error);
-                }
+                };
+
+                (async () => {
+                    try {
+                        while (true) {
+                            const {done, value} = await reader.read();
+                            if (done) break;
+
+                            buffer += decoder.decode(value, {stream: true});
+                            processBuffer();
+                        }
+                    } catch (error) {
+                        if (error instanceof Error && error.name !== 'AbortError') {
+                            console.error('Stream reading error:', error);
+                        }
+                    }
+                })();
+
+            } catch (error) {
+                console.error('Stream setup error:', error);
             }
         };
 
-        fetchAndStream();
+        // Start the stream processing in the background
+        fetchAndStream().catch(error => {
+            console.error('Stream initialization error:', error);
+        });
 
+        // Return the cleanup function immediately
         return () => {
             controller.abort();
         };

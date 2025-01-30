@@ -18,7 +18,7 @@ export default function RootLayout({
 
     return (
     <html lang="en" className="dark" >
-      <body className={`antialiased dark:bg-black-800`}>
+      <body className={`antialiased`}>
       <ThemeScript />
       <Providers>
           <LayoutWrapper>

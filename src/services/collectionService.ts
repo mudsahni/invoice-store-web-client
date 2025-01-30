@@ -4,10 +4,19 @@ import {
     NewCollectionRequest,
     CreateCollectionResponse,
     CollectionType,
-    SignedUrlResponse, CollectionStatusEvent
+    SignedUrlResponse, CollectionStatusEvent, GetCollectionsResponse
 } from '@/types/collections';
 
 export class CollectionsService {
+
+    async getCollections(): Promise<GetCollectionsResponse> {
+        const response = await apiClient.get<GetCollectionsResponse>(
+            API_ENDPOINTS.COLLECTIONS.LIST
+        );
+
+        return response
+    }
+
     /**
      * Create a new collection with the given files and metadata
      */

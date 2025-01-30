@@ -12,7 +12,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     return (
         <>
             {!isAuthPage && <Navigation />}
-            <main className="dark:bg-black-800">{children}</main>
+            <main>{children}</main>
             {!isAuthPage && <Footer />}
         </>
     );

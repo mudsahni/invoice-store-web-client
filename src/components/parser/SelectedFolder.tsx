@@ -1,4 +1,4 @@
-import {FileText} from "lucide-react";
+import {FileText, ArrowLeft} from "lucide-react";
 import React from "react";
 import {useNewCollectionContext} from "@/components/parser/context/NewCollectionContext";
 import {Checkbox} from "@/components/ui/checkbox";
@@ -49,17 +49,27 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
     //     );
     // };
     //
-    // const handleBrowseClick = () => {
-    //     fileInputRef.current?.click();
-    // };
+    const handleBrowseClick = () => {
+        fileInputRef.current?.click();
+    };
 
 
     return (
-        <>
-            <div className="flex justify-end text-gray-100">
-                Change Folder
+        <div>
+            <div className="flex justify-end mb-4">
+                <div
+                    className="flex text-theme-bg justify-center font-semibold tracking-normal align-middle bg-theme-bg border-2 border-theme-bg rounded-xl p-4 sm:min-w-[40%] min-w-full cursor-pointer bg-opacity-0 hover:bg-opacity-10"
+                    onClick={handleBrowseClick}
+                >
+                    <span>
+                        <ArrowLeft />
+                    </span>
+                    <span className="px-2 focus:scale-10 transition-transform">
+                        Change Folder
+                    </span>
+                </div>
             </div>
-        <div className="p-4 bg-gray-200 rounded-lg">
+        <div className="p-4 bg-theme-bg rounded-lg">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -104,11 +114,11 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
                 </div>
             </div>
 
-            <div className="border rounded-lg overflow-hidden">
+            <div className="border p-2 rounded-lg overflow-hidden">
                 <div className={`${pdfFiles.length > 6 ? 'max-h-96' : ''} overflow-y-auto`}>
                     <div className="flex justify-between pr-4 pb-4">
                         <div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm text-theme-text text-opacity-80">
                                 {selectedCount} of {pdfFiles.length} PDF files selected
                             </div>
                         </div>
@@ -122,16 +132,16 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
                         <div
                             key={file.id}
                             onClick={() => toggleFileSelection(file.id)}
-                            className={`flex cursor-pointer items-center px-4 py-3 rounded-lg mb-2 ${file.selected ? 'bg-green-600 bg-opacity-20 border-[1px] border-green-600' : 'border-opacity-10 border-gray-800 border-b-[1px] hover:bg-gray-300 transition-colors duration-200 hover:bg-opacity-50'}`}
+                            className={`flex cursor-pointer items-center px-4 py-3 rounded-lg mb-2 ${file.selected ? 'bg-secondary-600 bg-opacity-20 border-[1px] border-secondary-600' : 'border-opacity-10 border-theme-text border-b-[1px] hover:bg-theme-text transition-colors duration-200 hover:bg-opacity-10'}`}
                         >
                             <div className="flex items-center min-w-0 flex-1">
 
-                                <FileText className={`h-6 w-6 ${file.selected ? 'text-green-600' : 'text-gray-600'} mr-2 shrink-0`} />
+                                <FileText className={`h-6 w-6 ${file.selected ? 'text-secondary-600' : 'text-theme-text opacity-60'} mr-2 shrink-0`} />
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-sm text-black-800 tracking-wide truncate">
+                                    <p className="text-sm text-theme-text tracking-wide truncate">
                                         {file.webkitRelativePath ? file.webkitRelativePath.split('/').pop() : file.name}
                                     </p>
-                                    <p className="text-xs text-gray-600 truncate">
+                                    <p className="text-xs text-theme-text truncate">
                                         {file.webkitRelativePath || file.name}
                                     </p>
                                 </div>
@@ -162,6 +172,6 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
             {/*    </Button>*/}
             {/*)}*/}
         </div>
-            </>
+            </div>
     )
 }

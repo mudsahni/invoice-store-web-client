@@ -8,7 +8,7 @@ interface InputWithButtonProps {
     buttonLabel: string
     validate: (value: string) => { isValid: boolean; errorMessage?: string }
     loading: boolean
-    handleSubmit: (e: React.FormEvent) => Promise<void>
+    handleSubmit: (e: React.FormEvent) => Promise<(() => void) | undefined>
 }
 export const InputWithButton: React.FC<InputWithButtonProps> = (
         {
@@ -67,7 +67,7 @@ export const InputWithButton: React.FC<InputWithButtonProps> = (
 
     return (
         <div className="relative" ref={componentRef}>
-        <div className="flex max-w-7xl mx-auto rounded-lg overflow-hidden shadow-sm bg-gray-200 p-1 h-16 mb-2 mt-2">
+        <div className="flex max-w-7xl mx-auto rounded-lg overflow-hidden shadow-sm bg-theme-bg border-[1px] p-1 h-16 mb-2 mt-2">
             <div className={`flex rounded-lg flex-col flex-1 p-3 mr-2 relative`}> {/* Added relative for floating label positioning */}
                 <label
                     className={`absolute transition-all duration-400 pointer-events-none
@@ -83,26 +83,27 @@ export const InputWithButton: React.FC<InputWithButtonProps> = (
                     onChange={(e) => setValue(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    className={`bg-gray-200 text-base pt-2 font-normal text-gray-800 focus:outline-none mt-1 w-full`}
+                    className={`bg-theme-bg text-base pt-2 font-normal text-theme-text focus:outline-none mt-1 w-full`}
                 />
             </div>
             {
                 !isValid && <ExclamationCircleIcon
                 aria-hidden={true}
-                className="pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-pink-800 sm:size-8"
+                className="pointer-events-none col-start-1 row-start-1 mr-3 size-5 self-center justify-self-end text-tertiary-700 sm:size-7"
             />
             }
             <div className="flex-none w-[45%] lg:w-[40%]">
                 <button
+                    disabled={!isValid}
                     type="submit"
                     onClick={() => handleButtonClick}
-                    className='w-full h-full bg-green-700 rounded-lg text-white text-base sm:text-lg font-semibold px-6 hover:bg-green-800'
+                    className={`${!isValid ? "bg-theme-text bg-opacity-[45%]" : "bg-secondary-600 hover:bg-secondary-700"} w-full h-full  rounded-lg text-white text-base sm:text-lg font-semibold px-6 `}
                 >
                     {buttonLabel}
                 </button>
             </div>
         </div>
-        <p className={`text-sm tracking-wide text-gray-200 ${isValid && 'opacity-0'} pb-1`}>
+        <p className={`text-sm tracking-wide text-theme-bg ${isValid && 'opacity-0'} pb-1`}>
             {!isValid ? error : "..."}
         </p>
         </div>

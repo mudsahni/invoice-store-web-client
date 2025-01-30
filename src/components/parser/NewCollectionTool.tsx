@@ -6,12 +6,36 @@ import {useAuth} from "@/contexts/AuthContext";
 import {InputWithButton} from "@/components/ui/InputWithButton";
 import {XCircleIcon} from "lucide-react";
 import {collectionsService} from "@/services/collectionService";
-import {CollectionStatusEvent, CollectionType} from "@/types/collections";
+import {CollectionStatus, CollectionStatusEvent, CollectionType, CreateCollectionResponse} from "@/types/collections";
+import {useStreamEvents} from "@/hooks/useStreamEvents";
+import {Step, Steps} from "@/components/Steps";
+import { useRouter } from 'next/navigation';
+
+const defaultSteps: Step[] = [
+    { name: 'Select Folder', description: 'Select the folder with the files you want to store and parse.', href: '#', status: 'current' },
+    {
+        name: 'Select files for collection',
+        description: 'Select the files which you want to store and parse.',
+        href: '#',
+        status: 'upcoming',
+    },
+    { name: 'Enter collection name', description: 'Enter the name of the collection.', href: '#', status: 'upcoming' },
+    { name: 'Create Collection', description: 'Click on the create collection button!', href: '#', status: 'upcoming' },
+]
 
 let fileCounter = 0;
 const generateId = () => `pdf-${fileCounter++}`;
 
 export const NewCollectionTool = () => {
+    const [steps, setSteps] = React.useState<Step[]>(defaultSteps)
+    const router = useRouter();
+
+    const handleRowClick = (collectionId: string) => {
+        router.push(`/collections/${collectionId}`);
+    };
+
+
+    const { events, addEvent } = useStreamEvents<CollectionStatusEvent>();
 
     const {
         pdfFiles,
@@ -45,9 +69,11 @@ export const NewCollectionTool = () => {
             (event) => {
                 console.log('Received event:', event);
                 setCollectionStatus(event);
-
+                console.log('Adding event to stream:', event);
+                addEvent(event);
                 // Optionally unsubscribe when processing is complete
-                if (event.status === 'COMPLETED' || event.status === 'FAILED') {
+                if (event.status === CollectionStatus.COMPLETED || event.status === CollectionStatus.FAILED) {
+                    console.log(`${new Date().toISOString()} Processing complete, unsubscribing`);
                     unsubscribe();
                 }
             }
@@ -56,8 +82,43 @@ export const NewCollectionTool = () => {
         // Clean up subscription when component unmounts
         return unsubscribe;
     }
+
+    React.useEffect(() => {
+        if (pdfFiles.length === 0) {
+            setSteps(defaultSteps)
+        } else {
+            setSteps((prevState) => {
+                const updatedSteps = prevState
+                if (pdfFiles.length > 0) {
+                    updatedSteps[0].status = 'complete'
+                    updatedSteps[1].status = 'current'
+                    const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
+                    console.log("Any selected files", anySelectedFiles)
+                    if (anySelectedFiles) {
+                        updatedSteps[1].status = 'complete'
+                        updatedSteps[2].status = 'current'
+                    }
+                }
+
+                if (collectionName.length > 0) {
+                    updatedSteps[2].status = 'complete'
+                    updatedSteps[3].status = 'current'
+                }
+                return updatedSteps
+            })
+        }
+    }, [pdfFiles, collectionName])
+
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        let collectionCreationResponse: CreateCollectionResponse | undefined = undefined
+
+        setSteps((prevState) => {
+            const updatedSteps = prevState
+            updatedSteps[3].status = 'complete'
+            return updatedSteps
+        })
         let unsubscribe: (() => void) | undefined;
 
         const selectedFiles = pdfFiles.filter(file => file.selected);
@@ -90,11 +151,15 @@ export const NewCollectionTool = () => {
                 filesMap[pdfFile.file.name] = "application/pdf"
             }
 
-            const collectionCreationResponse = await collectionsService.createCollection(
+            collectionCreationResponse = await collectionsService.createCollection(
                 collectionName,
                 CollectionType.INVOICE,
                 filesMap
             );
+
+            if (collectionCreationResponse === undefined) {
+                throw new Error('Failed to create collection');
+            }
 
             // Store the unsubscribe function
             unsubscribe = await listenToCollectionStatusEvents(collectionCreationResponse.id);
@@ -108,9 +173,9 @@ export const NewCollectionTool = () => {
             console.log("Here is the response from the collection creation", collectionCreationResponse)
             await Promise.all(
                 Object.keys(collectionCreationResponse.documents).map(async (key) => {
-                    const signedUrlData = collectionCreationResponse.documents[key].uploadUrl;
-                    const fileName = collectionCreationResponse.documents[key].fileName;
-                    const documentId = collectionCreationResponse.documents[key].documentId;
+                    const signedUrlData = collectionCreationResponse!!.documents[key].uploadUrl;
+                    const fileName = collectionCreationResponse!!.documents[key].fileName;
+                    const documentId = collectionCreationResponse!!.documents[key].documentId;
                     console.log('Signed URL data:', signedUrlData)
                     if (signedUrlData) {
                         console.log('Uploading file:', fileName, documentId, signedUrlData);
@@ -136,8 +201,16 @@ export const NewCollectionTool = () => {
             setError(err instanceof Error ? err.message : 'Failed to process PDFs');
         } finally {
             setIsProcessing(false);
+        }
+
+
+        return () => {
             if (unsubscribe) {
+                console.log(`${new Date().toISOString()} Component cleanup, unsubscribing`);
                 unsubscribe();
+                if (collectionCreationResponse != undefined) {
+                    handleRowClick(collectionCreationResponse.id)
+                }
             }
         }
     };
@@ -198,6 +271,20 @@ export const NewCollectionTool = () => {
             });
 
         console.log('Processed PDF files:', pdfFiles);
+        setSteps((prevState) => {
+            const updatedSteps = prevState
+            if (pdfFiles.length > 0) {
+                updatedSteps[0].status = 'complete'
+                updatedSteps[1].status = 'current'
+                const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
+                console.log("Any selected files", anySelectedFiles)
+                if (anySelectedFiles) {
+                    updatedSteps[1].status = 'complete'
+                    updatedSteps[2].status = 'current'
+                }
+            }
+            return updatedSteps
+        })
         setPdfFiles(pdfFiles);
         setError('');
         setSuccess('');
@@ -213,7 +300,9 @@ export const NewCollectionTool = () => {
 
 
     return (
-        <div>
+        <div className={"rounded-xl pt-8"}>
+            <Steps steps={steps} />
+
             <form onSubmit={handleSubmit} className="space-y-4">
                 {pdfFiles.length === 0 ?
                     (

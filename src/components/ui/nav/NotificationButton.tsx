@@ -6,11 +6,11 @@ interface NotificationButtonProps {
 }
 
 export const NotificationButton: React.FC<NotificationButtonProps> = ({ mobile }) => {
-    const mobileButtonClasses = "relative ml-auto shrink-0 rounded-full bg-gray-800 p-1 " +
-        "text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 " +
-        "focus:ring-offset-gray-800"
-    const webButtonClasses = "relative shrink-0 rounded-full bg-stone-200 p-1 text-neutral-800 hover:text-white " +
-        "focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+    const mobileButtonClasses = "relative ml-auto shrink-0 rounded-full bg-theme-text p-1 " +
+        "text-theme-bg hover:text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-bg focus:ring-offset-2 " +
+        "focus:ring-offset-theme-bg hover:bg-theme-bg border-[1px] hover:border-theme-bg"
+    const webButtonClasses = "relative shrink-0 rounded-full bg-theme-bg border-2 border-theme-text p-1 text-theme-text hover:text-theme-bg hover:bg-theme-text " +
+        "focus:outline-none focus:ring-2 focus:ring-theme-bg focus:ring-offset-2 focus:ring-offset-theme-bg"
     const buttonClasses = mobile ?  mobileButtonClasses : webButtonClasses
 
     return (
