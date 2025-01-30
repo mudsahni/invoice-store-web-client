@@ -1,6 +1,7 @@
 import React, {ReactNode, useState} from "react";
 import {PDFFile, ProcessedData} from "@/components/parser/PDFFile";
 import { NewCollectionContext } from "./NewCollectionContext";
+import {CollectionStatusEvent} from "@/types/collections";
 
 export interface NewCollectionContextProviderProps {
     children: ReactNode;
@@ -14,6 +15,7 @@ export const NewCollectionContextProvider: React.FC<NewCollectionContextProvider
     const [selectedResult, setSelectedResult] = useState<string | null>(null);
     const [collectionName, setCollectionName] = useState<string>('');
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [createCollectionEvents, setCreateCollectionEvents] = useState<CollectionStatusEvent[]>([]);
 
     const value = {
         pdfFiles,
@@ -30,6 +32,8 @@ export const NewCollectionContextProvider: React.FC<NewCollectionContextProvider
         setError,
         isProcessing,
         setIsProcessing,
+        createCollectionEvents,
+        setCreateCollectionEvents
     };
 
     return (
