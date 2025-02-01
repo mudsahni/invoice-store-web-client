@@ -49,17 +49,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
 
+    // Check token expiration
+// Check token expiration
+    const checkTokenExpiration = async () => {
+        const BUFFER_TIME = 5 * 60 * 1000; // 5 minutes buffer
+        const authData = localStorage.getItem(`firebase:authUser:${auth.config.apiKey}:[DEFAULT]`);
+        if (authData) {
+            const userData = JSON.parse(authData);
+            const expirationTime = userData?.stsTokenManager?.expirationTime;
+
+            // Add logging to debug
+            console.log('Token check - Current time:', new Date(Date.now()));
+            console.log('Token check - Expiration time:', new Date(expirationTime));
+            console.log('Token check - Time until expiration (minutes):',
+                (expirationTime - Date.now()) / (1000 * 60));
+
+            if (expirationTime && (Date.now() + BUFFER_TIME) >= expirationTime) {
+                // Only sign out if we're really expired, not just close to expiring
+                if (Date.now() >= expirationTime) {
+                    console.log('Token expired, signing out user');
+                    await signOut();
+                    return false;
+                }
+                // If we're in the buffer period, let Firebase try to refresh the token
+                console.log('Token nearing expiration, allowing refresh attempt');
+            }
+            return true;
+        }
+        return false;
+    };
+
+
     const signIn = async (email: string, password: string) => {
         try {
+            console.log('Attempting sign in...');
+
             // Set persistence to local (persists even after browser restart)
             await setPersistence(auth, browserLocalPersistence);
 
             // Sign in with Firebase
-            await signInWithEmailAndPassword(auth, email, password);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            console.log('Sign in successful:', userCredential.user.uid);
+
+            // Debug token information
+            const token = await userCredential.user.getIdToken();
+            const tokenResult = await userCredential.user.getIdTokenResult();
+
+            console.log('Token expiration:', new Date(tokenResult.expirationTime));
+            console.log('Current time:', new Date());
+            console.log('Token valid for (minutes):',
+                (new Date(tokenResult.expirationTime).getTime() - Date.now()) / (1000 * 60)
+            );
+// // Store tenant info immediately after successful login
+            // // This ensures tenant info is available for the auth state change listener
+            // const userData = await fetchUserData('YOUR_TENANT_ID', userCredential.user.uid);
+            // if (userData?.tenantId) {
+            //     const tenantData = await fetchTenantData(userData.tenantId);
+            //     if (tenantData) {
+            //         localStorage.setItem('tenant', JSON.stringify({
+            //             id: userData.tenantId,
+            //             // Add any other necessary tenant info
+            //         }));
+            //         console.log('Tenant data stored:', userData.tenantId);
+            //     }
+            // }
 
             // Navigation will happen automatically through the onAuthStateChanged listener
             // which will fetch user data and redirect if successful
         } catch (error: any) {
+            console.error('Sign in error:', error);
             const errorMessage = getErrorMessage(error.code);
             throw new Error(errorMessage);
         }
@@ -80,10 +138,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
+        console.log('Setting up auth state listener...');
+        let isInitialCheck = true;  // Add this flag
+
+        console.log('Setting up auth state listener...');
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             try {
+                console.log('Auth state changed. User:', firebaseUser?.uid);
+                // Check token expiration first
+                // Skip expiration check on initial auth state change
+                if (!isInitialCheck) {
+                    // Check token expiration
+                    if (!await checkTokenExpiration()) {
+                        console.log("Token expired, skipping auth state change");
+                        return;
+                    }
+                }
+                isInitialCheck = false;
+
                 // Get tenant from localStorage
                 const savedTenant = localStorage.getItem('tenant');
+                console.log('Saved tenant:', savedTenant);
                 let tenantDetails = null;
                 if (savedTenant) {
                     tenantDetails = JSON.parse(savedTenant);
@@ -92,6 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setUser(firebaseUser);
 
                 if (firebaseUser && tenantDetails) {
+                    console.log('Fetching user data for tenant:', tenantDetails.id);
                     // Fetch user data from Firestore
                     const userData = await fetchUserData(tenantDetails.id, firebaseUser.uid);
                     if (!userData) {
@@ -100,7 +176,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         return;
                     }
 
+                    console.log('User data fetched:', userData);
                     // Fetch tenant data from Firestore
+                    console.log('Fetching tenant data...');
                     const tenantData = await fetchTenantData(tenantDetails.id);
                     if (!tenantData) {
                         console.error('Tenant data not found');
@@ -111,16 +189,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setAuthUser(userData);
                     setTenant(tenantData);
 
-                    // Only redirect to dashboard if we're on the login page
+                    // Only redirect to collections if we're on the login page
                     if (window.location.pathname === '/login') {
-                        router.push('/dashboard');
+                        console.log('Redirecting to collections...');
+                        router.push('/collections');
                     }
                 } else {
+                    console.log('No user or tenant data, clearing states');
                     setAuthUser(null);
                     setTenant(null);
 
                     // If no user or tenant, and we're not on login page, redirect to login page
                     if (window.location.pathname !== '/login') {
+                        console.log('Redirecting to login...');
                         router.push('/login');
                     }
                 }
@@ -133,8 +214,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
         });
 
+        // Modify the interval to be less frequent and add some guards
+        const tokenCheckInterval = setInterval(async () => {
+            if (auth.currentUser) {  // Only check if we have a user
+                try {
+                    // Try to refresh the token first
+                    await auth.currentUser.getIdToken(true);
+                } catch (error) {
+                    console.error('Error refreshing token:', error);
+                }
+                await checkTokenExpiration();
+            }
+        }, 5 * 60 * 1000); // Check every 5 minutes instead of every minute
+
+
         // Cleanup subscription on unmount
-        return () => unsubscribe();
+        return () => {
+            console.log('Cleaning up auth state listener...');
+            unsubscribe();
+            clearInterval(tokenCheckInterval);
+        }
     }, [router]);
 
     return (

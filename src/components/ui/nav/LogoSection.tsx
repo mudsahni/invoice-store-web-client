@@ -12,10 +12,10 @@ export const LogoSection = () => {
             />
             <Link
                 className={`ml-4 text-3xl font-normal tracking-normal text-theme-text`}
-                href={"/dashboard"}
+                href={"/collections"}
             >
-                              {APPLICATION_NAME}
-                            </Link>
+              {APPLICATION_NAME}
+            </Link>
 
         </div>
 

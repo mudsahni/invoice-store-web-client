@@ -1,13 +1,12 @@
 import React from "react";
-import {FolderSelection} from "@/components/parser/FolderSelection";
-import {SelectedFolder} from "@/components/parser/SelectedFolder";
-import {useNewCollectionContext} from "@/components/parser/context/NewCollectionContext";
+import {FolderSelection} from "@/components/collections/FolderSelection";
+import {SelectedFolder} from "@/components/collections/SelectedFolder";
+import {useNewCollectionContext} from "@/components/collections/context/NewCollectionContext";
 import {useAuth} from "@/contexts/AuthContext";
 import {InputWithButton} from "@/components/ui/InputWithButton";
 import {XCircleIcon} from "lucide-react";
 import {collectionsService} from "@/services/collectionService";
 import {CollectionStatus, CollectionStatusEvent, CollectionType, CreateCollectionResponse} from "@/types/collections";
-import {useStreamEvents} from "@/hooks/useStreamEvents";
 import {Step, Steps} from "@/components/Steps";
 import { useRouter } from 'next/navigation';
 
@@ -29,13 +28,22 @@ const generateId = () => `pdf-${fileCounter++}`;
 export const NewCollectionTool = () => {
     const [steps, setSteps] = React.useState<Step[]>(defaultSteps)
     const router = useRouter();
+    const [collectionCreationLoading, setCollectionCreationLoading] = React.useState<boolean>(false)
 
     const handleRowClick = (collectionId: string) => {
         router.push(`/collections/${collectionId}`);
     };
 
+    // Example state that changes based on user input or other logic
+    const [collectionId, setCollectionId] = React.useState<string | null>(null);
 
-    const { events, addEvent } = useStreamEvents<CollectionStatusEvent>();
+    // Once `shouldNavigate` is true, navigate to the dynamic page
+    React.useEffect(() => {
+        if (collectionId) {
+            // Replace 'abc' with the actual ID you want to navigate to
+            router.push(`/collections/${collectionId}`);
+        }
+    }, [collectionId, router]);
 
     const {
         pdfFiles,
@@ -47,7 +55,9 @@ export const NewCollectionTool = () => {
         collectionName,
         setCollectionName,
         setIsProcessing,
-        setSelectedResult
+        setSelectedResult,
+        createCollectionEvents,
+        setCreateCollectionEvents,
     } = useNewCollectionContext();
 
     const savedTenant = localStorage.getItem('tenant')
@@ -70,7 +80,7 @@ export const NewCollectionTool = () => {
                 console.log('Received event:', event);
                 setCollectionStatus(event);
                 console.log('Adding event to stream:', event);
-                addEvent(event);
+                setCreateCollectionEvents((prevState) => [...prevState, event]);
                 // Optionally unsubscribe when processing is complete
                 if (event.status === CollectionStatus.COMPLETED || event.status === CollectionStatus.FAILED) {
                     console.log(`${new Date().toISOString()} Processing complete, unsubscribing`);
@@ -112,22 +122,28 @@ export const NewCollectionTool = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setCollectionCreationLoading(true)
+        // set up create collection response
         let collectionCreationResponse: CreateCollectionResponse | undefined = undefined
 
+        // set steps
         setSteps((prevState) => {
             const updatedSteps = prevState
             updatedSteps[3].status = 'complete'
             return updatedSteps
         })
-        let unsubscribe: (() => void) | undefined;
 
+        // // set up event handler
+        // let unsubscribe: (() => void) | undefined;
+
+        // alert for not having selected any files
         const selectedFiles = pdfFiles.filter(file => file.selected);
-
         if (selectedFiles.length === 0) {
             setError('Please select at least one PDF file to process');
             return;
         }
 
+        // set vars
         setIsProcessing(true);
         setError('');
         setSuccess('');
@@ -159,10 +175,13 @@ export const NewCollectionTool = () => {
 
             if (collectionCreationResponse === undefined) {
                 throw new Error('Failed to create collection');
+            } else {
+                setCollectionId(collectionCreationResponse.id)
             }
 
-            // Store the unsubscribe function
-            unsubscribe = await listenToCollectionStatusEvents(collectionCreationResponse.id);
+            // // Store the unsubscribe function
+            // unsubscribe = await listenToCollectionStatusEvents(collectionCreationResponse.id);
+
 
             // create map of pdf files with name and file value from selected file
             const selectedFileMap: {[key:string]: File} = {}
@@ -204,15 +223,13 @@ export const NewCollectionTool = () => {
         }
 
 
-        return () => {
-            if (unsubscribe) {
-                console.log(`${new Date().toISOString()} Component cleanup, unsubscribing`);
-                unsubscribe();
-                if (collectionCreationResponse != undefined) {
-                    handleRowClick(collectionCreationResponse.id)
-                }
-            }
-        }
+        // return () => {
+        //     if (unsubscribe) {
+        //         console.log(`${new Date().toISOString()} Component cleanup, unsubscribing`);
+        //         unsubscribe();
+        //
+        //     }
+        // }
     };
 
     const validateInput = (value: string) => {
@@ -333,7 +350,7 @@ export const NewCollectionTool = () => {
                     buttonLabel={'Create Collection'}
                     placeholder={'Enter a collection name'}
                     validate={validateInput}
-                    loading={loading}
+                    loading={collectionCreationLoading}
                     handleSubmit={handleSubmit}
                 />
             </form>

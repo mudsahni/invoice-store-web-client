@@ -1,6 +1,6 @@
 // Create the context
 import {createContext, useContext} from "react";
-import {NewCollectionContextType} from "@/components/parser/context/NewCollectionContextType";
+import {NewCollectionContextType} from "@/components/collections/context/NewCollectionContextType";
 
 export const NewCollectionContext = createContext<NewCollectionContextType | undefined>(undefined);
 

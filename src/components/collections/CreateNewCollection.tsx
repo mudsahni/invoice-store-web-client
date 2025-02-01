@@ -1,5 +1,5 @@
-import {NewCollectionContextProvider} from "@/components/parser/context/NewCollectionContextProvider";
-import {NewCollectionTool} from "@/components/parser/NewCollectionTool";
+import {NewCollectionContextProvider} from "@/components/collections/context/NewCollectionContextProvider";
+import {NewCollectionTool} from "@/components/collections/NewCollectionTool";
 import React from "react";
 
 

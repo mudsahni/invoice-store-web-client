@@ -1,6 +1,6 @@
 'use client';
 
-import {ValidationIcon} from "@/components/parser/jsonviewer/ValidationIcon";
+import {ValidationIcon} from "@/components/jsonviewer/ValidationIcon";
 
 interface JsonFormFieldProps {
     label: string;

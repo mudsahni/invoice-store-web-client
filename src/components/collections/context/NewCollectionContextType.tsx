@@ -1,4 +1,4 @@
-import {PDFFile, ProcessedData} from "@/components/parser/PDFFile";
+import {PDFFile, ProcessedData} from "@/components/collections/PDFFile";
 import React from "react";
 import {CollectionStatusEvent} from "@/types/collections";
 
@@ -18,5 +18,6 @@ export interface NewCollectionContextType {
     setError: React.Dispatch<React.SetStateAction<string>>
     isProcessing: boolean
     setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>,
-    createCollectionEvents: CollectionStatusEvent[]
+    createCollectionEvents: CollectionStatusEvent[],
+    setCreateCollectionEvents: React.Dispatch<React.SetStateAction<CollectionStatusEvent[]>>
 }

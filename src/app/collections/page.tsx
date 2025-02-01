@@ -1,11 +1,8 @@
 'use client';
 
-import {Table} from "@/components/ui/datatable/table";
 import React, {useState} from "react";
-import {RefreshCw} from "lucide-react";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
-import {StatusType} from "@/components/ui/status";
-import {CreateNewCollection} from "@/components/parser/CreateNewCollection";
+import {CreateNewCollection} from "@/components/collections/CreateNewCollection";
 import ProtectedRoute from "@/contexts/ProtectedRoute";
 import {collectionsService} from "@/services/collectionService";
 

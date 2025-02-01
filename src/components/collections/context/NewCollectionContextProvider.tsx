@@ -1,5 +1,5 @@
 import React, {ReactNode, useState} from "react";
-import {PDFFile, ProcessedData} from "@/components/parser/PDFFile";
+import {PDFFile, ProcessedData} from "@/components/collections/PDFFile";
 import { NewCollectionContext } from "./NewCollectionContext";
 import {CollectionStatusEvent} from "@/types/collections";
 

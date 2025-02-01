@@ -1,6 +1,6 @@
 import {FileText, ArrowLeft} from "lucide-react";
 import React from "react";
-import {useNewCollectionContext} from "@/components/parser/context/NewCollectionContext";
+import {useNewCollectionContext} from "@/components/collections/context/NewCollectionContext";
 import {Checkbox} from "@/components/ui/checkbox";
 
 interface SelectedFolderProps {
@@ -37,18 +37,6 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
             )
         }
     }
-    // const handleSelectAll = () => {
-    //     setPdfFiles(prevFiles =>
-    //         prevFiles.map(file => ({ ...file, selected: true }))
-    //     );
-    // };
-    //
-    // const handleDeselectAll = () => {
-    //     setPdfFiles(prevFiles =>
-    //         prevFiles.map(file => ({ ...file, selected: false }))
-    //     );
-    // };
-    //
     const handleBrowseClick = () => {
         fileInputRef.current?.click();
     };
@@ -81,35 +69,6 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
             <div className="space-y-1">
                 <div className="flex justify-between items-center">
                     <div className="space-x-2 pb-2">
-                        {/*<Button*/}
-                        {/*    className={buttonClasses}*/}
-                        {/*    type="button"*/}
-                        {/*    variant="outline"*/}
-                        {/*    size="sm"*/}
-                        {/*    onClick={() => handleSelectAll()}*/}
-                        {/*    disabled={selectedCount === pdfFiles.length || pdfFiles.length === 0}*/}
-                        {/*>*/}
-                        {/*    Select All*/}
-                        {/*</Button>*/}
-                        {/*<Button*/}
-                        {/*    className={buttonClasses}*/}
-                        {/*    type="button"*/}
-                        {/*    variant="outline"*/}
-                        {/*    size="sm"*/}
-                        {/*    onClick={handleDeselectAll}*/}
-                        {/*    disabled={selectedCount === 0 || pdfFiles.length === 0}*/}
-                        {/*>*/}
-                        {/*    Deselect All*/}
-                        {/*</Button>*/}
-                        {/*<Button*/}
-                        {/*    className={buttonClasses}*/}
-                        {/*    type="button"*/}
-                        {/*    variant="outline"*/}
-                        {/*    size="sm"*/}
-                        {/*    onClick={handleBrowseClick}*/}
-                        {/*>*/}
-                        {/*    Change Folder*/}
-                        {/*</Button>*/}
                     </div>
                 </div>
             </div>
@@ -151,27 +110,7 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
                     ))}
                 </div>
             </div>
-
-            {/*{pdfFiles.length > 0 && (*/}
-            {/*    <Button*/}
-            {/*        type="submit"*/}
-            {/*        disabled={isProcessing || selectedCount === 0}*/}
-            {/*        className="w-full"*/}
-            {/*    >*/}
-            {/*        {isProcessing ? (*/}
-            {/*            <>*/}
-            {/*                <Loader2 className="animate-spin h-5 w-5 mr-2" />*/}
-            {/*                Processing {selectedCount} files...*/}
-            {/*            </>*/}
-            {/*        ) : (*/}
-            {/*            <>*/}
-            {/*                <Upload className="h-5 w-5 mr-2" />*/}
-            {/*                Process {selectedCount} Selected Files*/}
-            {/*            </>*/}
-            {/*        )}*/}
-            {/*    </Button>*/}
-            {/*)}*/}
         </div>
-            </div>
+    </div>
     )
 }
