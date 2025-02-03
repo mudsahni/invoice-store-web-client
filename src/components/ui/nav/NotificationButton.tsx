@@ -5,13 +5,13 @@ interface NotificationButtonProps {
     mobile: boolean
 }
 
-export const NotificationButton: React.FC<NotificationButtonProps> = ({ mobile }) => {
-    const mobileButtonClasses = "relative ml-auto shrink-0 rounded-full bg-theme-text p-1 " +
-        "text-theme-bg hover:text-theme-text focus:outline-none focus:ring-2 focus:ring-theme-bg focus:ring-offset-2 " +
-        "focus:ring-offset-theme-bg hover:bg-theme-bg border-[1px] hover:border-theme-bg"
-    const webButtonClasses = "relative shrink-0 rounded-full bg-theme-bg border-2 border-theme-text p-1 text-theme-text hover:text-theme-bg hover:bg-theme-text " +
-        "focus:outline-none focus:ring-2 focus:ring-theme-bg focus:ring-offset-2 focus:ring-offset-theme-bg"
-    const buttonClasses = mobile ?  mobileButtonClasses : webButtonClasses
+export const NotificationButton: React.FC<NotificationButtonProps> = ({mobile}) => {
+    const mobileButtonClasses = "relative ml-auto shrink-0 rounded-full bg-neutral-50 p-1 " +
+        "text-neutral-800 hover:text-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-900 focus:ring-offset-1 " +
+        "focus:ring-offset-neutral-900 hover:bg-neutral-100"
+    const webButtonClasses = "relative shrink-0 rounded-full bg-neutral-50 p-1 text-neutral-800 hover:text-neutral-900 hover:bg-neutral-100 " +
+        "focus:outline-none focus:ring-1 focus:ring-neutral-900 focus:ring-offset-1 focus:ring-offset-neutral-900"
+    const buttonClasses = mobile ? mobileButtonClasses : webButtonClasses
 
     return (
         <button

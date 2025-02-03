@@ -9,9 +9,9 @@ import {NavigationTypeProps} from "@/components/ui/nav/navigation";
 
 export const WebNavigation: React.FC<NavigationTypeProps> = ({navigation, pathname, user}) => {
     return (
-        <div className="mx-auto max-w-8xl lg:px-6 px-4">
+        <div className="mx-auto max-w-7xl px-8">
             <div className="relative flex h-16 items-center justify-between">
-                <div className="flex items-center px-2 lg:px-0">
+                <div className="flex items-center">
                     <LogoSection/>
                     { /* Navigation Links */}
                     <div className="hidden lg:ml-6 lg:block">

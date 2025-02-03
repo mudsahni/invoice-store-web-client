@@ -4,7 +4,7 @@ import {
     NewCollectionRequest,
     CreateCollectionResponse,
     CollectionType,
-    SignedUrlResponse, CollectionStatusEvent, GetCollectionsResponse
+    SignedUrlResponse, CollectionStatusEvent, GetCollectionsResponse, Collection, CollectionWithDocuments
 } from '@/types/collections';
 
 export class CollectionsService {
@@ -65,6 +65,18 @@ export class CollectionsService {
             onEvent
         );
         return unsubscribe;
+    }
+
+    async getCollection(
+        id: string
+    ): Promise<CollectionWithDocuments> {
+
+        const collection: CollectionWithDocuments = await apiClient.get<CollectionWithDocuments>(
+            API_ENDPOINTS.COLLECTIONS.GET_WITH_DOCUMENTS(id)
+        );
+
+        return collection
+
     }
 }
 

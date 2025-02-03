@@ -1,22 +1,22 @@
-import { HomeIcon } from '@heroicons/react/20/solid'
+import {HomeIcon, ChevronRightIcon} from '@heroicons/react/20/solid'
 
 const pages = [
-    { name: 'Projects', href: '#', current: false },
-    { name: 'Project Nero', href: '#', current: true },
+    {name: 'Projects', href: '#', current: false},
+    {name: 'Project Nero', href: '#', current: true},
 ]
 
-// interface BreadcrumbsProps {
-//     pages: { name: string, href: string, current: boolean }[]
-// }
+interface BreadcrumbsProps {
+    pages: { name: string, href: string, current: boolean }[]
+}
 
-export const Breadcrumbs = () => {
+export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({pages}) => {
     return (
-        <nav aria-label="Breadcrumb" className="flex pt-4 pb-12">
-            <ol role="list" className="flex items-center space-x-4">
+        <nav aria-label="Breadcrumb" className="flex bg-yellow-50 rounded-xl px-8 align-middle items-center">
+            <ol role="list" className="flex items-center space-x-2 align-middle py-8">
                 <li>
                     <div>
-                        <a href="#" className="text-theme-text opacity-80 hover:opacity-100">
-                            <HomeIcon aria-hidden="true" className="size-5 shrink-0" />
+                        <a href="#" className="text-yellow-800 opacity-80 hover:opacity-100">
+                            <HomeIcon aria-hidden="true" className="size-5 shrink-0"/>
                             <span className="sr-only">Home</span>
                         </a>
                     </div>
@@ -24,13 +24,11 @@ export const Breadcrumbs = () => {
                 {pages.map((page) => (
                     <li key={page.name}>
                         <div className="flex items-center">
-                            <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true" className="size-5 shrink-0 text-theme-text">
-                                <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                            </svg>
+                            <ChevronRightIcon className="h-4 text-yellow-800"/>
                             <a
                                 href={page.href}
                                 aria-current={page.current ? 'page' : undefined}
-                                className="ml-4 text-sm font-medium text-theme-text opacity-80 hover:opacity-100"
+                                className={`${page.current && "pointer-events-none cursor-not-allowed"} ml-2 text-sm font-medium text-yellow-800 opacity-80 hover:opacity-100`}
                             >
                                 {page.name}
                             </a>

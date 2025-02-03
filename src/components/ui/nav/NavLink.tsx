@@ -18,11 +18,11 @@ export const NavLink: React.FC<NavLinkProps> = ({mobile, pathname, item}) => {
     //     : `${TEXT_COLOR} hover:${HOVER_BACKGROUND_COLOR} hover:${HIGHLIGHTED_TEXT_COLOR}`
 
 
-    const mobileHoverStyles = "text-theme-bg transition-transform duration-100 tracking-wide opacity-80 hover:opacity-100"
-    const mobileHighlightLogic = pathname === item.href ? `text-theme-bg font-medium` : `font-medium ${mobileHoverStyles}`
+    const mobileHoverStyles = "text-neutral-900 hover:bg-neutral-100 transition-transform duration-100 tracking-wide opacity-80 hover:opacity-100"
+    const mobileHighlightLogic = pathname === item.href ? `text-neutral-900 font-medium bg-neutral-100` : `font-medium ${mobileHoverStyles}`
 
-    const hoverStyles = "text-theme-text transition-transform duration-100 tracking-wide opacity-80 hover:opacity-100"
-    const highlightLogic = pathname === item.href ? `text-theme-text font-medium` : `font-medium ${hoverStyles}`
+    const hoverStyles = "text-neutral-900 transition-transform duration-100 tracking-wide hover:bg-neutral-100 opacity-80 hover:opacity-100"
+    const highlightLogic = pathname === item.href ? `text-neutral-900 font-medium bg-neutral-100` : `font-medium ${hoverStyles}`
 
     return (
         mobile ? (

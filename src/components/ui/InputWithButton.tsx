@@ -23,7 +23,7 @@ export const InputWithButton: React.FC<InputWithButtonProps> = (
     ) => {
     const [isFocused, setIsFocused] = useState(false);
     const [isValid, setIsValid] = useState(true);
-    const [error, setError] = useState('garbage');
+    const [error, setError] = useState('');
     const componentRef = useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
@@ -95,15 +95,15 @@ export const InputWithButton: React.FC<InputWithButtonProps> = (
             }
             <div className="flex-none w-[45%] lg:w-[40%]">
                 <button
-                    disabled={!isValid}
+                    disabled={!isValid || loading}
                     type="submit"
                     onClick={() => handleButtonClick}
-                    className={`${!isValid ? "bg-theme-text bg-opacity-[45%]" : "bg-secondary-600 hover:bg-secondary-700"} w-full h-full  rounded-lg text-white text-base sm:text-lg font-semibold px-6 `}
+                    className={`${!isValid || loading ? "bg-theme-text bg-opacity-[45%]" : "bg-secondary-600 hover:bg-secondary-700"} w-full h-full  rounded-lg text-white text-sm sm:text-lg font-semibold px-6 `}
                 >
                     {loading ? (
-                        <>
+                        <div className="flex justify-center align-middle">
                             <svg
-                                className="animate-spin h-5 w-5 text-white"
+                                className="animate-spin h-5 w-5 text-white mr-4 align-middle mt-1"
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -123,10 +123,11 @@ export const InputWithButton: React.FC<InputWithButtonProps> = (
                                 />
                             </svg>
                             <span>Processing...</span>
-                        </>
+                        </div>
                     ) : (
                         buttonLabel
-                    )}                </button>
+                    )}
+                </button>
             </div>
         </div>
         <p className={`text-sm tracking-wide text-theme-bg ${isValid && 'opacity-0'} pb-1`}>

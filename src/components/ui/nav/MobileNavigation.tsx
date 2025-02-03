@@ -7,23 +7,23 @@ import {NavigationTypeProps} from "@/components/ui/nav/navigation";
 
 export const MobileNavigation: React.FC<NavigationTypeProps> = ({navigation, pathname, user}) => {
     return (
-        <DisclosurePanel className="lg:hidden bg-theme-text">
+        <DisclosurePanel className="lg:hidden">
             <div className="space-y-1 px-2 pb-3 pt-2">
                 {navigation.map((item) =>
                     <NavLink key={item.name} mobile={true} pathname={pathname} item={item}/>
                 )}
             </div>
-            <div className="border-t border-theme-bg pb-3 pt-4">
+            <div className="border-t border-neutral-800 pb-3 pt-4">
                 <div className="flex items-center px-5">
                     <div className="shrink-0">
-                        <ProfilePicture />
+                        <ProfilePicture/>
                     </div>
-                    <ProfileInformation name={user?.firstName + " " + user?.lastName || ''} email={user?.email || ''} />
+                    <ProfileInformation name={user?.firstName + " " + user?.lastName || ''} email={user?.email || ''}/>
 
-                    <NotificationButton mobile={true} />
+                    <NotificationButton mobile={true}/>
 
                 </div>
-                <ProfileDropdown mobile={true} user={user} />
+                <ProfileDropdown mobile={true} user={user}/>
             </div>
         </DisclosurePanel>
     )

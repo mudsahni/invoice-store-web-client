@@ -30,10 +30,6 @@ export const NewCollectionTool = () => {
     const router = useRouter();
     const [collectionCreationLoading, setCollectionCreationLoading] = React.useState<boolean>(false)
 
-    const handleRowClick = (collectionId: string) => {
-        router.push(`/collections/${collectionId}`);
-    };
-
     // Example state that changes based on user input or other logic
     const [collectionId, setCollectionId] = React.useState<string | null>(null);
 
@@ -71,27 +67,6 @@ export const NewCollectionTool = () => {
 
     const {authUser, loading} = useAuth();
 
-
-    const listenToCollectionStatusEvents = async (collectionId: string) => {
-        // Start listening to events
-        const unsubscribe = await collectionsService.subscribeToCollectionEvents(
-            collectionId,
-            (event) => {
-                console.log('Received event:', event);
-                setCollectionStatus(event);
-                console.log('Adding event to stream:', event);
-                setCreateCollectionEvents((prevState) => [...prevState, event]);
-                // Optionally unsubscribe when processing is complete
-                if (event.status === CollectionStatus.COMPLETED || event.status === CollectionStatus.FAILED) {
-                    console.log(`${new Date().toISOString()} Processing complete, unsubscribing`);
-                    unsubscribe();
-                }
-            }
-        );
-
-        // Clean up subscription when component unmounts
-        return unsubscribe;
-    }
 
     React.useEffect(() => {
         if (pdfFiles.length === 0) {
@@ -233,6 +208,13 @@ export const NewCollectionTool = () => {
     };
 
     const validateInput = (value: string) => {
+        const selectedFiles = pdfFiles.filter(pdfFile => pdfFile.selected)
+        if (selectedFiles.length === 0) {
+            return {
+                isValid: false,
+                errorMessage: 'Please select atleast one file.'
+            }
+        }
         if (value.length < 4) {
             setIsCollectionNameValid(false)
             return {

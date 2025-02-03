@@ -7,11 +7,12 @@ interface ProfilePictureInformationProps {
     name: string | null
     email: string | null
 }
+
 export const ProfileInformation: React.FC<ProfilePictureInformationProps> = ({name, email}) => {
     return (
         <div className="ml-3">
-            <div className="text-base font-medium text-theme-bg">{name}</div>
-            <div className="text-sm font-medium text-theme-bg opacity-80">{email}</div>
+            <div className="text-base font-medium text-neutral-900">{name}</div>
+            <div className="text-sm font-medium text-neutral-900 opacity-80">{email}</div>
         </div>
 
     )
@@ -43,7 +44,7 @@ export const ProfileMenuItem: React.FC<ProfileMenuItemProps> = ({mobile, name, h
             <DisclosureButton
                 as="a"
                 href={href}
-                className="block rounded-md px-3 py-2 text-base font-medium text-theme-bg hover:bg-theme-bg hover:text-theme-text"
+                className="block rounded-md px-3 py-2 text-base font-medium text-neutral-800 hover:bg-neutral-100 hover:text-neutral-900"
                 onClick={onClick}
             >
                 {name}
@@ -53,7 +54,7 @@ export const ProfileMenuItem: React.FC<ProfileMenuItemProps> = ({mobile, name, h
             <MenuItem>
                 <a
                     href={href}
-                    className="block px-4 py-2 text-sm text-theme-bg hover:bg-theme-text hover:text-theme-text hover:bg-theme-bg"
+                    className="block px-4 py-2 text-sm text-neutral-800 hover:bg-neutral-100 hover:text-neutral-900"
                     onClick={onClick}
                 >
                     {name}
@@ -115,25 +116,27 @@ export const ProfileDropdown: React.FC<ProfileDropDownProps> = ({mobile}) => {
         mobile ? (
             <div className="mt-3 space-y-1 px-2">
                 {PROFILE_MENU_ITEMS.map((item) =>
-                    <ProfileMenuItem key={item.name} mobile={true} name={item.name} href={item.href} onClick={item.onClick} />
+                    <ProfileMenuItem key={item.name} mobile={true} name={item.name} href={item.href}
+                                     onClick={item.onClick}/>
                 )}
             </div>
         ) : (
             <Menu as="div" className="relative ml-4 shrink-0">
                 <div>
                     <MenuButton
-                        className="relative flex rounded-full bg-theme-text text-sm text-theme-bg focus:outline-none focus:ring-1 focus:ring-theme-text focus:ring-offset-1 focus:ring-offset-theme-text">
+                        className="relative flex rounded-full bg-white text-sm text-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:ring-offset-1 focus:ring-offset-neutral-800">
                         <span className="absolute -inset-1.5"/>
                         <span className="sr-only">Open user menu</span>
-                        <ProfilePicture />
+                        <ProfilePicture/>
                     </MenuButton>
                 </div>
                 <MenuItems
                     transition
-                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-theme-text py-1 shadow-lg ring-1 ring-theme-text/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                    className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-neutral-800/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                 >
                     {PROFILE_MENU_ITEMS.map((item) =>
-                        <ProfileMenuItem key={item.name} mobile={false} name={item.name} href={item.href} onClick={item.onClick} />
+                        <ProfileMenuItem key={item.name} mobile={false} name={item.name} href={item.href}
+                                         onClick={item.onClick}/>
                     )}
                 </MenuItems>
             </Menu>

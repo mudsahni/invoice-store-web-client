@@ -9,6 +9,18 @@ export default {
   ],
     theme: {
         extend: {
+            keyframes: {
+                wave: {
+                    '0%': { transform: 'translateY(0)' },
+                    '50%': { transform: 'translateY(-6px)' },
+                    '100%': { transform: 'translateY(0)' }
+                },
+            },
+            animation: {
+                'wave-1': 'wave 1s ease-in-out',
+                'wave-2': 'wave 1s ease-in-out 0.2s',
+                'wave-3': 'wave 1s ease-in-out 0.4s',
+            },
             colors: {
                 // Light background
                 'theme-bg': '#FAFAFA',

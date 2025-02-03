@@ -1,6 +1,8 @@
 // src/app/collections/[id]/page.tsx
 import React from "react";
-import CollectionPage from "@/components/collections/CollectionPage";
+import CollectionPage from "@/components/collection/CollectionPage";
+import ProtectedRoute from "@/contexts/ProtectedRoute";
+import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 
 export default async function Page(
     props: {
@@ -11,11 +13,14 @@ export default async function Page(
     const params = await props.params;
 
     return (
-        <div>
-            <h1>Collection: {params.id}</h1>
-            <div>
+        <ProtectedRoute>
+            <div className="py-8">
+                {/*<div className="px-8 mx-auto max-w-7xl">*/}
+                {/*<Breadcrumbs/>*/}
+                {/*</div>*/}
+
                 <CollectionPage id={params.id} />
             </div>
-        </div>
+        </ProtectedRoute>
     );
 }

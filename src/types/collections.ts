@@ -1,3 +1,5 @@
+import {InvoiceWrapper} from "@/types/invoice";
+
 export enum CollectionType {
     'INVOICE' = 'INVOICE'
 }
@@ -31,6 +33,14 @@ export enum DocumentStatus {
     APPROVED = "APPROVED",
 
 }
+
+export enum DocumentType {
+    INVOICE = "INVOICE",
+    RECEIPT = "RECEIPT",
+    OTHER = "OTHER",
+    INVALID = "INVALID"
+}
+
 export interface CollectionError {
     message: string;
     code: CollectionErrorType;
@@ -78,4 +88,62 @@ export interface GetCollectionResponse {
 }
 export interface GetCollectionsResponse {
     collections: GetCollectionResponse[];
+}
+
+export interface Collection {
+    id: string;
+    name: string;
+    type: CollectionType;
+    documents: Record<string, DocumentStatus>;
+    tags: Map<string, string>;
+    createdAt: string;
+    updatedAt: string;
+    updatedBy: string;
+}
+
+export interface StructuredData {
+    raw?: string;
+    structured?: InvoiceWrapper
+}
+
+export interface DocumentError {
+    message: string;
+    code: string;
+}
+
+export enum PermissionType {
+    OWNER = 'OWNER',
+    EDITOR = 'EDITOR',
+    VIEWER = 'VIEWER'
+}
+
+export interface CollectionDocument {
+    id: string;
+    name: string;
+    path: string;
+    type: DocumentType;
+    collectionId: string;
+    status: DocumentStatus;
+    data: StructuredData;
+    private: boolean;
+    error: DocumentError;
+    permissions: Map<string, PermissionType>;
+    createdAt: { seconds: number; nanos: number };
+    createdBy: string;
+    updatedAt?: { seconds: number; nanos: number };
+    updatedBy?: string;
+    tags: Map<string, string>;
+
+}
+export interface CollectionWithDocuments {
+    id: string;
+    name: string;
+    type: CollectionType;
+    status: CollectionStatus;
+    documents: Record<string, CollectionDocument>;
+    tags: Map<string, string>;
+    createdAt: { seconds: number; nanos: number };
+    createdBy: string;
+    updatedAt?: { seconds: number; nanos: number };
+    updatedBy?: string;
 }
