@@ -18,16 +18,17 @@ export const ProfileInformation: React.FC<ProfilePictureInformationProps> = ({na
     )
 }
 
-export const ProfilePicture = () => {
-    return (
-        <div className="hover:scale-105 transition-transform duration-500">
-            <img
-                alt=""
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                className="size-8 rounded-full"
-            />
-        </div>
+interface ProfilePictureProps {
+    firstName: string;
+    lastName: string;
+}
 
+export const ProfilePicture: React.FC<ProfilePictureProps> = ({firstName, lastName}) => {
+    return (
+        <div
+            className="hover:scale-105 transition-transform duration-500 bg-indigo-200 h-10 w-10 rounded-3xl border-2 border-indigo-800 flex items-center align-middle justify-center">
+            <span className="text-indigo-800 font-semibold">{`${firstName.charAt(0)}${lastName.charAt(0)}`}</span>
+        </div>
     )
 }
 
@@ -75,8 +76,9 @@ export const ProfileDropdown: React.FC<ProfileDropDownProps> = ({mobile}) => {
     const [, setError] = useState('');
     const [, setIsLoading] = useState(false);
 
-    const {signOut} = useAuth()
-
+    const {signOut, authUser} = useAuth()
+    const firstName = authUser?.firstName || "U";
+    const lastName = authUser?.lastName || "S";
     // const handleSignOut = async () => {
     //     try {
     //         await signOut();
@@ -98,7 +100,6 @@ export const ProfileDropdown: React.FC<ProfileDropDownProps> = ({mobile}) => {
             setIsLoading(false);
         }
     };
-
 
     const PROFILE_MENU_ITEMS = [
         {
@@ -124,10 +125,10 @@ export const ProfileDropdown: React.FC<ProfileDropDownProps> = ({mobile}) => {
             <Menu as="div" className="relative ml-4 shrink-0">
                 <div>
                     <MenuButton
-                        className="relative flex rounded-full bg-white text-sm text-neutral-900 focus:outline-none focus:ring-1 focus:ring-neutral-800 focus:ring-offset-1 focus:ring-offset-neutral-800">
+                        className="relative flex rounded-full bg-white text-sm text-neutral-900 focus:outline-none focus:ring-1 focus:ring-indigo-800 focus:ring-offset-1 focus:ring-offset-indigo-800">
                         <span className="absolute -inset-1.5"/>
                         <span className="sr-only">Open user menu</span>
-                        <ProfilePicture/>
+                        <ProfilePicture firstName={firstName} lastName={lastName}/>
                     </MenuButton>
                 </div>
                 <MenuItems

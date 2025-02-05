@@ -6,7 +6,7 @@ import React from "react";
 export const CreateNewCollection: React.FC = () => {
     return (
         <NewCollectionContextProvider>
-            <NewCollectionTool />
+            <NewCollectionTool/>
         </NewCollectionContextProvider>
     )
 }

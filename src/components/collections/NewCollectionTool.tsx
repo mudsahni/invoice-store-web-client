@@ -6,20 +6,25 @@ import {useAuth} from "@/contexts/AuthContext";
 import {InputWithButton} from "@/components/ui/InputWithButton";
 import {XCircleIcon} from "lucide-react";
 import {collectionsService} from "@/services/collectionService";
-import {CollectionStatus, CollectionStatusEvent, CollectionType, CreateCollectionResponse} from "@/types/collections";
-import {Step, Steps} from "@/components/Steps";
-import { useRouter } from 'next/navigation';
+import {CollectionStatusEvent, CollectionType, CreateCollectionResponse} from "@/types/collections";
+import {Step} from "@/components/Steps";
+import {useRouter} from 'next/navigation';
 
 const defaultSteps: Step[] = [
-    { name: 'Select Folder', description: 'Select the folder with the files you want to store and parse.', href: '#', status: 'current' },
+    {
+        name: 'Select Folder',
+        description: 'Select the folder with the files you want to store and parse.',
+        href: '#',
+        status: 'current'
+    },
     {
         name: 'Select files for collection',
         description: 'Select the files which you want to store and parse.',
         href: '#',
         status: 'upcoming',
     },
-    { name: 'Enter collection name', description: 'Enter the name of the collection.', href: '#', status: 'upcoming' },
-    { name: 'Create Collection', description: 'Click on the create collection button!', href: '#', status: 'upcoming' },
+    {name: 'Enter collection name', description: 'Enter the name of the collection.', href: '#', status: 'upcoming'},
+    {name: 'Create Collection', description: 'Click on the create collection button!', href: '#', status: 'upcoming'},
 ]
 
 let fileCounter = 0;
@@ -41,6 +46,7 @@ export const NewCollectionTool = () => {
         }
     }, [collectionId, router]);
 
+
     const {
         pdfFiles,
         setPdfFiles,
@@ -52,8 +58,6 @@ export const NewCollectionTool = () => {
         setCollectionName,
         setIsProcessing,
         setSelectedResult,
-        createCollectionEvents,
-        setCreateCollectionEvents,
     } = useNewCollectionContext();
 
     const savedTenant = localStorage.getItem('tenant')
@@ -97,7 +101,6 @@ export const NewCollectionTool = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setCollectionCreationLoading(true)
         // set up create collection response
         let collectionCreationResponse: CreateCollectionResponse | undefined = undefined
 
@@ -108,27 +111,30 @@ export const NewCollectionTool = () => {
             return updatedSteps
         })
 
-        // // set up event handler
-        // let unsubscribe: (() => void) | undefined;
-
+        if (pdfFiles.length === 0) {
+            setError('No folder selected.');
+            return;
+        }
         // alert for not having selected any files
         const selectedFiles = pdfFiles.filter(file => file.selected);
         if (selectedFiles.length === 0) {
-            setError('Please select at least one PDF file to process');
+            setError('Please select at least one PDF file to process.');
+            return;
+        }
+
+        if (collectionName.length === 0) {
+            setError('Please enter a collection name.');
             return;
         }
 
         // set vars
+        setCollectionCreationLoading(true)
         setIsProcessing(true);
         setError('');
         setSuccess('');
 
         try {
-            // Log the files we're about to send
-            console.log('Selected files:', selectedFiles);
-
             if (!authUser || !authUser.email) {
-                console.log('Auth user:', authUser)
                 throw new Error('User information not available');
             }
 
@@ -154,12 +160,8 @@ export const NewCollectionTool = () => {
                 setCollectionId(collectionCreationResponse.id)
             }
 
-            // // Store the unsubscribe function
-            // unsubscribe = await listenToCollectionStatusEvents(collectionCreationResponse.id);
-
-
             // create map of pdf files with name and file value from selected file
-            const selectedFileMap: {[key:string]: File} = {}
+            const selectedFileMap: { [key: string]: File } = {}
             selectedFiles.map(file => {
                 selectedFileMap[file.file.name] = file.file
             })
@@ -180,12 +182,10 @@ export const NewCollectionTool = () => {
             );
 
 
-
             setSuccess(`Successfully uploaded ${selectedFiles.length} PDF files!`);
             setProcessedData(collectionCreationResponse.documents);
             setSuccess(`Successfully processed ${selectedFiles.length} PDF files!`);
 
-            // Select the first result by default
             // Select the first result by default
             const firstFileName = Object.keys(collectionCreationResponse.documents)[0];
             if (firstFileName) {
@@ -197,26 +197,12 @@ export const NewCollectionTool = () => {
             setIsProcessing(false);
         }
 
-
-        // return () => {
-        //     if (unsubscribe) {
-        //         console.log(`${new Date().toISOString()} Component cleanup, unsubscribing`);
-        //         unsubscribe();
-        //
-        //     }
-        // }
     };
 
     const validateInput = (value: string) => {
-        const selectedFiles = pdfFiles.filter(pdfFile => pdfFile.selected)
-        if (selectedFiles.length === 0) {
-            return {
-                isValid: false,
-                errorMessage: 'Please select atleast one file.'
-            }
-        }
         if (value.length < 4) {
             setIsCollectionNameValid(false)
+            setError('Input must be at least 4 characters.')
             return {
                 isValid: false,
                 errorMessage: 'Input must be at least 4 characters.'
@@ -225,6 +211,7 @@ export const NewCollectionTool = () => {
         // Check for length between 0 and 100
         if (value.length > 100) {
             setIsCollectionNameValid(false)
+            setError('Input must be less than 100 characters')
             return {
                 isValid: false,
                 errorMessage: 'Input must be less than 100 characters'
@@ -235,6 +222,7 @@ export const NewCollectionTool = () => {
         const validCharacterRegex = /^[a-zA-Z0-9._-]*$/;
         if (!validCharacterRegex.test(value)) {
             setIsCollectionNameValid(false)
+            setError('Only letters, numbers, underscores (_), dashes (-), and periods (.) are allowed')
             return {
                 isValid: false,
                 errorMessage: 'Only letters, numbers, underscores (_), dashes (-), and periods (.) are allowed'
@@ -300,25 +288,13 @@ export const NewCollectionTool = () => {
 
     return (
         <div className={"rounded-xl pt-8"}>
-            <Steps steps={steps} />
+            {/*<Steps steps={steps} />*/}
 
             <form onSubmit={handleSubmit} className="space-y-4">
+
                 {pdfFiles.length === 0 ?
                     (
                         <>
-                            {error.length > 0 && (
-                                <div className="rounded-md bg-red-50 p-4">
-                                    <div className="flex">
-                                        <div className="shrink-0">
-                                            <XCircleIcon aria-hidden="true" className="size-5 text-red-400"/>
-                                        </div>
-                                        <div className="ml-3">
-                                            <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            )}
                             <FolderSelection fileInputRef={fileInputRef} handleFolderSelect={handleFolderSelect}/>
                         </>
 
@@ -335,6 +311,21 @@ export const NewCollectionTool = () => {
                     loading={collectionCreationLoading}
                     handleSubmit={handleSubmit}
                 />
+
+                {error.length > 0 && (
+                    <div className="rounded-md bg-red-50 p-4">
+                        <div className="flex">
+                            <div className="shrink-0">
+                                <XCircleIcon aria-hidden="true" className="size-5 text-red-400"/>
+                            </div>
+                            <div className="ml-3">
+                                <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                )}
+
             </form>
         </div>
     )

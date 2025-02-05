@@ -2,9 +2,8 @@
 import React from "react";
 import CollectionPage from "@/components/collection/CollectionPage";
 import ProtectedRoute from "@/contexts/ProtectedRoute";
-import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 
-export default async function Page(
+export default async function Collection(
     props: {
         params: Promise<{ id: string }>;
     }
@@ -15,11 +14,7 @@ export default async function Page(
     return (
         <ProtectedRoute>
             <div className="py-8">
-                {/*<div className="px-8 mx-auto max-w-7xl">*/}
-                {/*<Breadcrumbs/>*/}
-                {/*</div>*/}
-
-                <CollectionPage id={params.id} />
+                <CollectionPage id={params.id}/>
             </div>
         </ProtectedRoute>
     );

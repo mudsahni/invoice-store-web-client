@@ -28,7 +28,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({pages}) => {
                             <a
                                 href={page.href}
                                 aria-current={page.current ? 'page' : undefined}
-                                className={`${page.current && "pointer-events-none cursor-not-allowed"} ml-2 text-sm font-medium text-yellow-800 opacity-80 hover:opacity-100`}
+                                className={`${page.current && "pointer-events-none cursor-not-allowed"} font-medium ml-2 text-sm text-yellow-800 opacity-80 hover:opacity-100`}
                             >
                                 {page.name}
                             </a>

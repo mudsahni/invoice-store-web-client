@@ -1,6 +1,6 @@
 import React from 'react'
 import {CollectionDocument} from "@/types/collections";
-import {DocumentIcon, ChevronDownIcon} from '@heroicons/react/20/solid'
+import {DocumentTextIcon, ChevronDownIcon} from '@heroicons/react/20/solid'
 import {OptionsMenu} from "@/components/collection/OptionsMenu";
 import {JsonView, allExpanded, defaultStyles, darkStyles} from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
@@ -72,7 +72,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({documents}) => {
                                                             onClick={() => toggleRow(key)}
                                                         >
                                                             <div className="flex align-middle items-center">
-                                                                <DocumentIcon className="h-4 mr-1 text-sky-700"/>
+                                                                <DocumentTextIcon className="h-4 mr-1 text-sky-700"/>
                                                                 <div
                                                                     className="font-medium text-sky-700">{value.name}</div>
                                                                 <ChevronDownIcon
