@@ -1,25 +1,30 @@
-import type { Config } from "tailwindcss";
+import type {Config} from "tailwindcss";
 
 export default {
     darkMode: ['selector'],
     content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
+        "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    ],
     theme: {
         extend: {
             keyframes: {
+                'bounce-x': {
+                    '0%, 100%': {transform: 'translateX(0)'},
+                    '50%': {transform: 'translateX(25%)'}
+                },
                 wave: {
-                    '0%': { transform: 'translateY(0)' },
-                    '50%': { transform: 'translateY(-6px)' },
-                    '100%': { transform: 'translateY(0)' }
+                    '0%': {transform: 'translateY(0)'},
+                    '50%': {transform: 'translateY(-6px)'},
+                    '100%': {transform: 'translateY(0)'}
                 },
             },
             animation: {
                 'wave-1': 'wave 1s ease-in-out',
                 'wave-2': 'wave 1s ease-in-out 0.2s',
                 'wave-3': 'wave 1s ease-in-out 0.4s',
+                'bounce-x': 'bounce-x 1s infinite'
             },
             colors: {
                 // Light background
