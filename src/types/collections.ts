@@ -81,11 +81,14 @@ export interface GetCollectionResponse {
     id: string;
     name: string;
     type: CollectionType;
-    documents: Record<string, DocumentStatus>;
-    createdAt: string;
-    updatedAt: string;
-    updatedBy: string;
+    documents?: Record<string, DocumentStatus>;
+    status: CollectionStatus;
+    tags: Map<string, string>;
+    createdAt: { seconds: number; nanos: number };
+    updatedAt?: { seconds: number; nanos: number };
+    updatedBy?: string;
 }
+
 export interface GetCollectionsResponse {
     collections: GetCollectionResponse[];
 }
@@ -135,6 +138,7 @@ export interface CollectionDocument {
     tags: Map<string, string>;
 
 }
+
 export interface CollectionWithDocuments {
     id: string;
     name: string;
