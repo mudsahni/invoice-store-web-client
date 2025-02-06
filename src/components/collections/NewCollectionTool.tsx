@@ -7,31 +7,30 @@ import {InputWithButton} from "@/components/ui/InputWithButton";
 import {XCircleIcon} from "lucide-react";
 import {collectionsService} from "@/services/collectionService";
 import {CollectionStatusEvent, CollectionType, CreateCollectionResponse} from "@/types/collections";
-import {Step} from "@/components/Steps";
 import {useRouter} from 'next/navigation';
 
-const defaultSteps: Step[] = [
-    {
-        name: 'Select Folder',
-        description: 'Select the folder with the files you want to store and parse.',
-        href: '#',
-        status: 'current'
-    },
-    {
-        name: 'Select files for collection',
-        description: 'Select the files which you want to store and parse.',
-        href: '#',
-        status: 'upcoming',
-    },
-    {name: 'Enter collection name', description: 'Enter the name of the collection.', href: '#', status: 'upcoming'},
-    {name: 'Create Collection', description: 'Click on the create collection button!', href: '#', status: 'upcoming'},
-]
-
+// const defaultSteps: Step[] = [
+//     {
+//         name: 'Select Folder',
+//         description: 'Select the folder with the files you want to store and parse.',
+//         href: '#',
+//         status: 'current'
+//     },
+//     {
+//         name: 'Select files for collection',
+//         description: 'Select the files which you want to store and parse.',
+//         href: '#',
+//         status: 'upcoming',
+//     },
+//     {name: 'Enter collection name', description: 'Enter the name of the collection.', href: '#', status: 'upcoming'},
+//     {name: 'Create Collection', description: 'Click on the create collection button!', href: '#', status: 'upcoming'},
+// ]
+//
 let fileCounter = 0;
 const generateId = () => `pdf-${fileCounter++}`;
 
 export const NewCollectionTool = () => {
-    const [steps, setSteps] = React.useState<Step[]>(defaultSteps)
+    // const [steps, setSteps] = React.useState<Step[]>(defaultSteps)
     const router = useRouter();
     const [collectionCreationLoading, setCollectionCreationLoading] = React.useState<boolean>(false)
 
@@ -72,31 +71,31 @@ export const NewCollectionTool = () => {
     const {authUser, loading} = useAuth();
 
 
-    React.useEffect(() => {
-        if (pdfFiles.length === 0) {
-            setSteps(defaultSteps)
-        } else {
-            setSteps((prevState) => {
-                const updatedSteps = prevState
-                if (pdfFiles.length > 0) {
-                    updatedSteps[0].status = 'complete'
-                    updatedSteps[1].status = 'current'
-                    const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
-                    console.log("Any selected files", anySelectedFiles)
-                    if (anySelectedFiles) {
-                        updatedSteps[1].status = 'complete'
-                        updatedSteps[2].status = 'current'
-                    }
-                }
-
-                if (collectionName.length > 0) {
-                    updatedSteps[2].status = 'complete'
-                    updatedSteps[3].status = 'current'
-                }
-                return updatedSteps
-            })
-        }
-    }, [pdfFiles, collectionName])
+    // React.useEffect(() => {
+    //     if (pdfFiles.length === 0) {
+    //         setSteps(defaultSteps)
+    //     } else {
+    //         setSteps((prevState) => {
+    //             const updatedSteps = prevState
+    //             if (pdfFiles.length > 0) {
+    //                 updatedSteps[0].status = 'complete'
+    //                 updatedSteps[1].status = 'current'
+    //                 const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
+    //                 console.log("Any selected files", anySelectedFiles)
+    //                 if (anySelectedFiles) {
+    //                     updatedSteps[1].status = 'complete'
+    //                     updatedSteps[2].status = 'current'
+    //                 }
+    //             }
+    //
+    //             if (collectionName.length > 0) {
+    //                 updatedSteps[2].status = 'complete'
+    //                 updatedSteps[3].status = 'current'
+    //             }
+    //             return updatedSteps
+    //         })
+    //     }
+    // }, [pdfFiles, collectionName])
 
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -105,11 +104,11 @@ export const NewCollectionTool = () => {
         let collectionCreationResponse: CreateCollectionResponse | undefined = undefined
 
         // set steps
-        setSteps((prevState) => {
-            const updatedSteps = prevState
-            updatedSteps[3].status = 'complete'
-            return updatedSteps
-        })
+        // setSteps((prevState) => {
+        //     const updatedSteps = prevState
+        //     updatedSteps[3].status = 'complete'
+        //     return updatedSteps
+        // })
 
         if (pdfFiles.length === 0) {
             setError('No folder selected.');
@@ -258,20 +257,20 @@ export const NewCollectionTool = () => {
             });
 
         console.log('Processed PDF files:', pdfFiles);
-        setSteps((prevState) => {
-            const updatedSteps = prevState
-            if (pdfFiles.length > 0) {
-                updatedSteps[0].status = 'complete'
-                updatedSteps[1].status = 'current'
-                const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
-                console.log("Any selected files", anySelectedFiles)
-                if (anySelectedFiles) {
-                    updatedSteps[1].status = 'complete'
-                    updatedSteps[2].status = 'current'
-                }
-            }
-            return updatedSteps
-        })
+        // setSteps((prevState) => {
+        //     const updatedSteps = prevState
+        //     if (pdfFiles.length > 0) {
+        //         updatedSteps[0].status = 'complete'
+        //         updatedSteps[1].status = 'current'
+        //         const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
+        //         console.log("Any selected files", anySelectedFiles)
+        //         if (anySelectedFiles) {
+        //             updatedSteps[1].status = 'complete'
+        //             updatedSteps[2].status = 'current'
+        //         }
+        //     }
+        //     return updatedSteps
+        // })
         setPdfFiles(pdfFiles);
         setError('');
         setSuccess('');

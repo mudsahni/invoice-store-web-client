@@ -5,7 +5,7 @@ import {
     BookOpenIcon,
     FolderPlusIcon,
     ChevronRightIcon,
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon, ArrowPathIcon
 } from "@heroicons/react/20/solid";
 import {NewCollectionContextProvider} from "@/components/collections/context/NewCollectionContextProvider";
 import {NewCollectionTool} from "@/components/collections/NewCollectionTool";
@@ -127,10 +127,10 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
                         </div>
                     </div>
                     <div className="relative">
-                        {loadCollections ? <LoadingSpinner size={6}/> : <MagnifyingGlassIcon
+                        <MagnifyingGlassIcon
                             aria-hidden="true"
                             className="size-5 relative z-10 group-hover:scale-[1.5] transition-transform duration-500"
-                        />}
+                        />
 
                     </div>
                 </button>
@@ -172,8 +172,13 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
                             <FolderOpenIcon className="h-6 mr-4 text-sky-800"/>
                             <span className="text-2xl/7 text-sky-800 font-medium">Your Collections</span>
                         </div>
-                        <XCircleIcon className="text-sky-700 h-6 hover:text-sky-900 cursor-pointer"
-                                     onClick={() => setBrowseCollections(false)}/>
+                        <div className="flex justify-end">
+                            <ArrowPathIcon
+                                className={`text-sky-700 h-6 hover:text-sky-900 mr-4 cursor-pointer hover:rotate-180 transition-transform duration-500 ${loadCollections ? 'animate-spin' : ''}`}
+                                onClick={() => getCollections()}/>
+                            <XCircleIcon className="text-sky-700 h-6 hover:text-sky-900 cursor-pointer"
+                                         onClick={() => setBrowseCollections(false)}/>
+                        </div>
                     </div>
                     <p className="text-base font-medium text-sky-700 py-8">All your collections in one place.</p>
                     {loadCollections ?

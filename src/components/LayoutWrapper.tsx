@@ -12,7 +12,7 @@ export function LayoutWrapper({children}: { children: React.ReactNode }) {
     return (
         <>
             {!isAuthPage && <Navigation/>}
-            <main className="min-h-[80vh]">{children}</main>
+            <main className="min-h-[60vh]">{children}</main>
             {!isAuthPage && <Footer/>}
         </>
     );

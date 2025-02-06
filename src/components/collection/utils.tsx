@@ -2,6 +2,7 @@ import {CollectionStatus, CollectionWithDocuments} from "@/types/collections";
 import React from 'react'
 import {CheckCircleIcon} from '@heroicons/react/20/solid'
 import {LoadingSpinner} from "@/components/LoadingSpinner";
+import ReactDOM from 'react-dom';
 
 const CACHE_PREFIX = "collection_"
 // Cache configuration
@@ -98,3 +99,19 @@ export const CollectionStatusComponent: React.FC<CollectionStatusComponentProps>
     }
     return <InProgressBadge size={size}/>
 }
+
+interface PortalProps {
+    children: React.ReactNode;
+}
+
+export const Portal: React.FC<PortalProps> = ({children}) => {
+    const [mounted, setMounted] = React.useState(false);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null;
+
+    return ReactDOM.createPortal(children, document.body);
+};

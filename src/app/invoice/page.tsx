@@ -1,4 +1,4 @@
-// 'use client';
+'use client';
 //
 // import { useState } from 'react';
 // import { RecursiveJsonForm } from '@/components/parser/jsonviewer/RecursiveJsonForm';
@@ -668,6 +668,460 @@
 //         </div>
 //     );
 // }
-export default function example() {
-    return <div></div>
+import React, {useState} from 'react';
+import {PlusIcon} from '@heroicons/react/20/solid';
+import {TaxCategory} from "@/types/invoice";
+import {TrashIcon} from "lucide-react";
+
+interface InvoiceFormProps {
+    // onSubmit: (data: InvoiceWrapper) => void;
 }
+
+export default function Page() {
+    return (
+        <InvoiceForm/>
+    )
+}
+const InvoiceForm: React.FC<InvoiceFormProps> = () => {
+    type SectionName = 'customer' | 'vendor' | 'billedAmount' | 'lineItems' | 'bankDetails';
+
+// Define the type for the openSections state
+    interface OpenSections {
+        customer: boolean;
+        vendor: boolean;
+        billedAmount: boolean;
+        lineItems: boolean;
+        bankDetails: boolean;
+    }
+
+    const [openSections, setOpenSections] = useState<OpenSections>({
+        customer: true,
+        vendor: false,
+        billedAmount: false,
+        lineItems: false,
+        bankDetails: false
+    });
+    const [lineItems, setLineItems] = useState([{}]);
+    const [bankDetails, setBankDetails] = useState([{}]);
+
+    const toggleSection = (section: SectionName) => {
+        setOpenSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
+
+    const addLineItem = () => {
+        setLineItems(prev => [...prev, {}]);
+    };
+
+    const removeLineItem = (index: number) => {
+        setLineItems(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const addBankDetail = () => {
+        setBankDetails(prev => [...prev, {}]);
+    };
+
+    const removeBankDetail = (index: number) => {
+        setBankDetails(prev => prev.filter((_, i) => i !== index));
+    };
+
+    return (
+        <div className="max-w-7xl mx-auto p-8">
+            <form className="p-8 bg-neutral-50 rounded-xl">
+                {/* Basic Invoice Details */}
+                <div className="space-y-6 mb-8">
+                    <h2 className="text-2xl/7 font-semibold text-neutral-800">Invoice Details</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Invoice Number</label>
+                            <input
+                                type="text"
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Currency Code</label>
+                            <input
+                                type="text"
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Billing Date</label>
+                            <input
+                                type="date"
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Due Date</label>
+                            <input
+                                type="date"
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Place of Supply</label>
+                            <input
+                                type="text"
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <hr className="p-2"/>
+                {/* Customer Section */}
+                <div className="rounded-lg mb-6">
+                    <span className="text-xl font-medium text-neutral-800">Customer Details</span>
+
+                    <div className="py-4 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">Name</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">GST Number</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">PAN</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Billing Address</label>
+                            <textarea
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                rows={3}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Shipping Address</label>
+                            <textarea
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                rows={3}
+                            />
+                        </div>
+                    </div>
+                </div>
+                <hr className="p-2"/>
+
+                {/* Vendor Section */}
+                <div className="rounded-lg mb-6">
+                    <span className="text-xl font-medium text-neutral-800">Vendor Details</span>
+                    <div className="py-4 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">Name</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">GST Number</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">PAN</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">UPI ID</label>
+                                <input
+                                    type="text"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-neutral-700">Address</label>
+                            <textarea
+                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                rows={3}
+                            />
+                        </div>
+
+                        {/* Bank Details */}
+                        <div className="space-y-4 bg-neutral-100 rounded-xl">
+                            <div className="flex justify-between items-center p-4">
+                                <h3 className="text-lg font-medium text-neutral-900">Bank Details</h3>
+                                <button
+                                    type="button"
+                                    onClick={addBankDetail}
+                                    className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-sky-700 bg-sky-100 hover:bg-sky-200"
+                                >
+                                    <PlusIcon className="h-4 w-4 mr-1"/>
+                                    Add Bank
+                                </button>
+                            </div>
+                            {bankDetails.map((_, index) => (
+                                <div key={index} className="rounded-md p-4 space-y-4">
+                                    <div className="flex justify-between">
+                                        <span
+                                            className="text-sm text-neutral-700 font-semibold">Bank #{index + 1}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeBankDetail(index)}
+                                            className="text-red-600 hover:text-red-800"
+                                        >
+                                            <TrashIcon className="h-5 w-5"/>
+                                        </button>
+
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Bank
+                                                Name</label>
+                                            <input
+                                                type="text"
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">Account
+                                                Number</label>
+                                            <input
+                                                type="text"
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700">IFSC</label>
+                                            <input
+                                                type="text"
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label
+                                                className="block text-sm font-medium text-gray-700">Branch</label>
+                                            <input
+                                                type="text"
+                                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">Branch
+                                            Address</label>
+                                        <textarea
+                                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                            rows={2}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <hr className="p-2"/>
+
+                {/* Line Items Section */}
+                <div className="rounded-lg pb-8">
+                    <span className="text-lg font-medium text-neutral-800">Line Items</span>
+                    <div className="py-y space-y-4">
+                        <div className="flex justify-end">
+                            <button
+                                type="button"
+                                onClick={addLineItem}
+                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-sky-700 bg-sky-100 hover:bg-sky-200"
+                            >
+                                <PlusIcon className="h-4 w-4 mr-1"/>
+                                Add Line Item
+                            </button>
+                        </div>
+
+                        {lineItems.map((_, index) => (
+                            <div key={index} className="bg-neutral-100 rounded-xl p-4 space-y-4">
+                                <div className="flex justify-between items-start">
+                                    <h4 className="text-base font-medium text-neutral-800">Item {index + 1}</h4>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeLineItem(index)}
+                                        className="text-red-600 hover:text-red-800"
+                                    >
+                                        <TrashIcon className="h-5 w-5"/>
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label
+                                            className="block text-sm font-medium text-neutral-700">Description</label>
+                                        <input
+                                            type="text"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-neutral-700">HSN/SAC</label>
+                                        <input
+                                            type="text"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-neutral-700">Rate</label>
+                                        <input
+                                            type="number"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-neutral-700">Amount</label>
+                                        <input
+                                            type="number"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Quantity */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-neutral-700">Quantity
+                                            Value</label>
+                                        <input
+                                            type="number"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-neutral-700">Unit</label>
+                                        <input
+                                            type="text"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Discount */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-neutral-700">Discount
+                                            Percentage</label>
+                                        <input
+                                            type="number"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-neutral-700">Discount
+                                            Amount</label>
+                                        <input
+                                            type="number"
+                                            className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Taxes */}
+                                <div className="space-y-2">
+                                    <label className="block text-sm font-medium text-neutral-700">Taxes</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div>
+                                            <select
+                                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm">
+                                                {Object.values(TaxCategory).map(category => (
+                                                    <option key={category} value={category}>{category}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <input
+                                                type="number"
+                                                placeholder="Rate"
+                                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <input
+                                                type="number"
+                                                placeholder="Amount"
+                                                className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <hr className="p-2"/>
+
+                {/* Billed Amount Section */}
+                <div className="rounded-lg">
+                    <span className="text-lg font-medium text-neutral-800">Billed Amount</span>
+                    <div className="py-4 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">Sub Total</label>
+                                <input
+                                    type="number"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">Total</label>
+                                <input
+                                    type="number"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">Balance Due</label>
+                                <input
+                                    type="number"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-neutral-700">Previous Dues</label>
+                                <input
+                                    type="number"
+                                    className="mt-1 block w-full rounded-md border border-neutral-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Amount in Words</label>
+                            <input
+                                type="text"
+                                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+
+                <div className="flex justify-end pt-6">
+                    <button
+                        type="submit"
+                        className="text-base px-4 py-2 bg-sky-200 border-2 border-sky-800 font-medium text-sky-800 rounded-lg hover:bg-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                    >
+                        Save Invoice
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+};

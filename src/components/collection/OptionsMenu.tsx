@@ -54,32 +54,32 @@ interface OptionsMenuProps {
 
 export const OptionsMenu: React.FC<OptionsMenuProps> = ({menuItems, menuName}) => {
     const menuItemsToRender = menuItems || DEFAULT_OPTIONS_MENU_ITEMS;
-    React.useEffect(() => {
-        const updateMenuPosition = (event: Event) => {
-            const button = event.currentTarget as HTMLElement;
-            const rect = button.getBoundingClientRect();
-            document.documentElement.style.setProperty(
-                '--menu-position-right',
-                `${window.innerWidth - rect.right}px`
-            );
-            document.documentElement.style.setProperty(
-                '--menu-position-top',
-                `${rect.bottom + window.scrollY}px`
-            );
-        };
-
-        const buttons = document.querySelectorAll('.menu-button');
-        buttons.forEach(button => {
-            button.addEventListener('click', updateMenuPosition as EventListener);
-        });
-
-        return () => {
-            buttons.forEach(button => {
-                button.removeEventListener('click', updateMenuPosition as EventListener);
-            });
-        };
-    }, []);
-
+    // React.useEffect(() => {
+    //     const updateMenuPosition = (event: Event) => {
+    //         const button = event.currentTarget as HTMLElement;
+    //         const rect = button.getBoundingClientRect();
+    //         document.documentElement.style.setProperty(
+    //             '--menu-position-right',
+    //             `${window.innerWidth - rect.right}px`
+    //         );
+    //         document.documentElement.style.setProperty(
+    //             '--menu-position-top',
+    //             `${rect.bottom + window.scrollY}px`
+    //         );
+    //     };
+    //
+    //     const buttons = document.querySelectorAll('.menu-button');
+    //     buttons.forEach(button => {
+    //         button.addEventListener('click', updateMenuPosition as EventListener);
+    //     });
+    //
+    //     return () => {
+    //         buttons.forEach(button => {
+    //             button.removeEventListener('click', updateMenuPosition as EventListener);
+    //         });
+    //     };
+    // }, []);
+    //
     return <Menu as="div" className="relative inline-block text-left">
         <div>
             <MenuButton
@@ -90,12 +90,7 @@ export const OptionsMenu: React.FC<OptionsMenuProps> = ({menuItems, menuName}) =
 
         <MenuItems
             transition
-            className="fixed right-30 bottom-10 z-50 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-            style={{
-                // position: 'fixed',
-                // right: 'var(--menu-position-right, 16px)',
-                // top: 'var(--menu-position-top, 16px)'
-            }}
+            className="absolute right-0 z-50 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black/5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
         >
             <div className="py-1">
                 {
