@@ -11,10 +11,10 @@ export const LogoSection = () => {
                 className="h-14 opacity-80 w-auto hover:cursor-pointer hover:opacity-100 hover:scale-110 transition duration-300 ease-in-out"
             />
             <Link
-                className={`ml-4 text-3xl font-normal tracking-normal text-theme-text`}
+                className={`ml-4 text-3xl font-normal tracking-normal dark:text-gray-50 text-neutral-800`}
                 href={"/collections"}
             >
-              {APPLICATION_NAME}
+                {APPLICATION_NAME}
             </Link>
 
         </div>

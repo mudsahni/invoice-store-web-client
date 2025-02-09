@@ -124,12 +124,8 @@ const CollectionMetadataContent: React.FC<CollectionMetadataContentProps> = ({co
 }
 export const CollectionMetadata: React.FC<CollectionMetadataProps> = ({collection}) => {
     return (
-        <div className="max-w-7xl mx-auto p-8">
-            <div className="bg-sky-50 rounded-xl">
-                <div className="flex flex-col p-8">
-                    <CollectionMetadataContent collection={collection}/>
-                </div>
-            </div>
+        <div className="p-8 bg-sky-50 rounded-xl">
+            <CollectionMetadataContent collection={collection}/>
         </div>
     )
 }

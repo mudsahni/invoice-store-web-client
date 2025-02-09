@@ -10,10 +10,11 @@ export function LayoutWrapper({children}: { children: React.ReactNode }) {
     const isAuthPage = pathname === '/login';
 
     return (
-        <>
+        <div className="min-h-screen flex flex-col px-2 sm:px-0">
             {!isAuthPage && <Navigation/>}
-            <main className="min-h-[60vh]">{children}</main>
+            <main
+                className="dark:bg-gray-900 flex-grow">{children}</main>
             {!isAuthPage && <Footer/>}
-        </>
+        </div>
     );
 }

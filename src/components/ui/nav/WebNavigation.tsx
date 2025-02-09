@@ -9,7 +9,7 @@ import {NavigationTypeProps} from "@/components/ui/nav/navigation";
 
 export const WebNavigation: React.FC<NavigationTypeProps> = ({navigation, pathname, user}) => {
     return (
-        <div className="mx-auto max-w-7xl px-8">
+        <div className="mx-auto max-w-8xl dark:bg-gray-900 sm:px-8 px-2">
             <div className="relative flex h-16 items-center justify-between">
                 <div className="flex items-center">
                     <LogoSection/>
@@ -32,7 +32,7 @@ export const WebNavigation: React.FC<NavigationTypeProps> = ({navigation, pathna
                         <NotificationButton mobile={false}/>
 
                         {/* Profile dropdown */}
-                        <ProfileDropdown mobile={false} user={user} />
+                        <ProfileDropdown mobile={false} user={user}/>
                     </div>
                 </div>
             </div>

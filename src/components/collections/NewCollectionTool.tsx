@@ -3,29 +3,20 @@ import {FolderSelection} from "@/components/collections/FolderSelection";
 import {SelectedFolder} from "@/components/collections/SelectedFolder";
 import {useNewCollectionContext} from "@/components/collections/context/NewCollectionContext";
 import {useAuth} from "@/contexts/AuthContext";
-import {InputWithButton} from "@/components/ui/InputWithButton";
+import {InputWithButton} from "@/components/collections/InputWithButton";
 import {XCircleIcon} from "lucide-react";
 import {collectionsService} from "@/services/collectionService";
 import {CollectionStatusEvent, CollectionType, CreateCollectionResponse} from "@/types/collections";
 import {useRouter} from 'next/navigation';
+import {Steps, StepStatus} from "@/components/Steps";
 
-// const defaultSteps: Step[] = [
-//     {
-//         name: 'Select Folder',
-//         description: 'Select the folder with the files you want to store and parse.',
-//         href: '#',
-//         status: 'current'
-//     },
-//     {
-//         name: 'Select files for collection',
-//         description: 'Select the files which you want to store and parse.',
-//         href: '#',
-//         status: 'upcoming',
-//     },
-//     {name: 'Enter collection name', description: 'Enter the name of the collection.', href: '#', status: 'upcoming'},
-//     {name: 'Create Collection', description: 'Click on the create collection button!', href: '#', status: 'upcoming'},
-// ]
-//
+const defaultSteps = [
+    {id: '01', name: 'Select Folder', status: StepStatus.NOT_STARTED},
+    {id: '02', name: 'Select Files', status: StepStatus.NOT_STARTED},
+    {id: '03', name: 'Add Collection Name', status: StepStatus.NOT_STARTED},
+    {id: '04', name: 'Create Collection', status: StepStatus.NOT_STARTED},
+]
+
 let fileCounter = 0;
 const generateId = () => `pdf-${fileCounter++}`;
 
@@ -33,14 +24,13 @@ export const NewCollectionTool = () => {
     // const [steps, setSteps] = React.useState<Step[]>(defaultSteps)
     const router = useRouter();
     const [collectionCreationLoading, setCollectionCreationLoading] = React.useState<boolean>(false)
-
+    const [steps, setSteps] = React.useState(defaultSteps);
     // Example state that changes based on user input or other logic
     const [collectionId, setCollectionId] = React.useState<string | null>(null);
 
     // Once `shouldNavigate` is true, navigate to the dynamic page
     React.useEffect(() => {
         if (collectionId) {
-            // Replace 'abc' with the actual ID you want to navigate to
             router.push(`/collections/${collectionId}`);
         }
     }, [collectionId, router]);
@@ -54,9 +44,10 @@ export const NewCollectionTool = () => {
         setSuccess,
         setProcessedData,
         collectionName,
-        setCollectionName,
         setIsProcessing,
         setSelectedResult,
+        showError,
+        setShowError
     } = useNewCollectionContext();
 
     const savedTenant = localStorage.getItem('tenant')
@@ -65,50 +56,66 @@ export const NewCollectionTool = () => {
         savedTenantJson = JSON.parse(savedTenant)
     }
     const fileInputRef = React.createRef<HTMLInputElement>();
-    const [, setIsCollectionNameValid] = React.useState(false);
+    const [isCollectionNameValid, setIsCollectionNameValid] = React.useState(false);
     const [, setCollectionStatus] = React.useState<CollectionStatusEvent | null>(null);
 
     const {authUser, loading} = useAuth();
 
+    React.useEffect(() => {
+        // Create new array to avoid mutating state directly
+        const updatedSteps = [...steps];
 
-    // React.useEffect(() => {
-    //     if (pdfFiles.length === 0) {
-    //         setSteps(defaultSteps)
-    //     } else {
-    //         setSteps((prevState) => {
-    //             const updatedSteps = prevState
-    //             if (pdfFiles.length > 0) {
-    //                 updatedSteps[0].status = 'complete'
-    //                 updatedSteps[1].status = 'current'
-    //                 const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
-    //                 console.log("Any selected files", anySelectedFiles)
-    //                 if (anySelectedFiles) {
-    //                     updatedSteps[1].status = 'complete'
-    //                     updatedSteps[2].status = 'current'
-    //                 }
-    //             }
-    //
-    //             if (collectionName.length > 0) {
-    //                 updatedSteps[2].status = 'complete'
-    //                 updatedSteps[3].status = 'current'
-    //             }
-    //             return updatedSteps
-    //         })
-    //     }
-    // }, [pdfFiles, collectionName])
+        // Helper function to update step status
+        const updateStep = (index: number, status: StepStatus) => {
+            updatedSteps[index] = {...updatedSteps[index], status};
+        };
 
+        // Step 1: Folder Selection
+        const folderSelected = pdfFiles.length > 0;
+        updateStep(0, folderSelected ? StepStatus.COMPLETED : StepStatus.NOT_STARTED);
+
+        // Step 2: File Selection
+        const filesSelected = pdfFiles.filter(file => file.selected).length > 0;
+        updateStep(1,
+            !folderSelected ? StepStatus.NOT_STARTED :
+                filesSelected ? StepStatus.COMPLETED :
+                    StepStatus.IN_PROGRESS
+        );
+
+        // Step 3: Collection Name - Now completed when valid
+        const collectionNameValid = collectionName.length > 0 && validateInput(collectionName).isValid;
+        updateStep(2,
+            !folderSelected || !filesSelected ? StepStatus.NOT_STARTED :
+                collectionNameValid ? StepStatus.COMPLETED :
+                    StepStatus.IN_PROGRESS
+        );
+
+        // Step 4: Create Collection
+        updateStep(3,
+            !folderSelected || !filesSelected || !collectionNameValid
+                ? StepStatus.NOT_STARTED
+                : StepStatus.IN_PROGRESS
+        );
+
+        // Only update state if steps have changed
+        if (JSON.stringify(steps) !== JSON.stringify(updatedSteps)) {
+            setSteps(updatedSteps);
+        }
+
+    }, [pdfFiles, collectionName, isCollectionNameValid, steps]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const {isValid, errorMessage} = validateInput(collectionName);
+
+        if (!isValid) {
+            setShowError(true);
+            // Optionally update the error state here.
+            setError(errorMessage);
+            return;
+        }
         // set up create collection response
         let collectionCreationResponse: CreateCollectionResponse | undefined = undefined
-
-        // set steps
-        // setSteps((prevState) => {
-        //     const updatedSteps = prevState
-        //     updatedSteps[3].status = 'complete'
-        //     return updatedSteps
-        // })
 
         if (pdfFiles.length === 0) {
             setError('No folder selected.');
@@ -199,9 +206,24 @@ export const NewCollectionTool = () => {
     };
 
     const validateInput = (value: string) => {
+        // check if folder is selected
+        if (pdfFiles.length === 0) {
+            return {
+                isValid: false,
+                errorMessage: 'No folder selected.'
+            };
+        }
+
+        // check for selected files
+        const selectedFiles = pdfFiles.filter(file => file.selected);
+        if (selectedFiles.length === 0) {
+            return {
+                isValid: false,
+                errorMessage: 'Please select at least one PDF file to process.'
+            };
+        }
         if (value.length < 4) {
             setIsCollectionNameValid(false)
-            setError('Input must be at least 4 characters.')
             return {
                 isValid: false,
                 errorMessage: 'Input must be at least 4 characters.'
@@ -210,7 +232,6 @@ export const NewCollectionTool = () => {
         // Check for length between 0 and 100
         if (value.length > 100) {
             setIsCollectionNameValid(false)
-            setError('Input must be less than 100 characters')
             return {
                 isValid: false,
                 errorMessage: 'Input must be less than 100 characters'
@@ -257,20 +278,6 @@ export const NewCollectionTool = () => {
             });
 
         console.log('Processed PDF files:', pdfFiles);
-        // setSteps((prevState) => {
-        //     const updatedSteps = prevState
-        //     if (pdfFiles.length > 0) {
-        //         updatedSteps[0].status = 'complete'
-        //         updatedSteps[1].status = 'current'
-        //         const anySelectedFiles = pdfFiles.filter(file => file.selected).length > 0
-        //         console.log("Any selected files", anySelectedFiles)
-        //         if (anySelectedFiles) {
-        //             updatedSteps[1].status = 'complete'
-        //             updatedSteps[2].status = 'current'
-        //         }
-        //     }
-        //     return updatedSteps
-        // })
         setPdfFiles(pdfFiles);
         setError('');
         setSuccess('');
@@ -278,18 +285,33 @@ export const NewCollectionTool = () => {
         setSelectedResult(null);
 
         if (files.length === 0) {
-            setError('No folder selected');
+            setError('No folder selected.');
+            setShowError(true)
         } else if (pdfFiles.length === 0) {
-            setError('No PDF files found in the selected folder');
+            setError('No PDF files found in the selected folder.');
+            setShowError(true)
         }
     };
 
 
     return (
         <div className={"rounded-xl pt-8"}>
-            {/*<Steps steps={steps} />*/}
+            <Steps steps={steps}/>
+            {showError && error.length > 0 && (
+                <div className="rounded-md bg-red-50 p-4 mb-4">
+                    <div className="flex">
+                        <div className="shrink-0">
+                            <XCircleIcon aria-hidden="true" className="size-5 text-red-400"/>
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                        </div>
+                    </div>
+                </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            )}
+
+            <div className="space-y-4">
 
                 {pdfFiles.length === 0 ?
                     (
@@ -302,30 +324,12 @@ export const NewCollectionTool = () => {
                     )
                 }
                 <InputWithButton
-                    value={collectionName}
-                    setValue={setCollectionName}
-                    buttonLabel={'Create Collection'}
-                    placeholder={'Enter a collection name'}
-                    validate={validateInput}
                     loading={collectionCreationLoading}
                     handleSubmit={handleSubmit}
                 />
 
-                {error.length > 0 && (
-                    <div className="rounded-md bg-red-50 p-4">
-                        <div className="flex">
-                            <div className="shrink-0">
-                                <XCircleIcon aria-hidden="true" className="size-5 text-red-400"/>
-                            </div>
-                            <div className="ml-3">
-                                <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                            </div>
-                        </div>
-                    </div>
 
-                )}
-
-            </form>
+            </div>
         </div>
     )
 }

@@ -11,7 +11,7 @@ export interface Invoice {
     customer?: Customer;
     vendor?: Vendor;
     billedAmount?: BilledAmount;
-    lineItems: LineItem[];
+    lineItems?: LineItem[];
 }
 
 export interface Customer {
@@ -54,7 +54,7 @@ export interface LineItem {
     rate?: number;
     amount?: number;
     discount?: Discount;
-    taxes: Tax[];
+    taxes?: Tax[];
 }
 
 export interface Discount {

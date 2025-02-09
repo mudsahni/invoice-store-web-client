@@ -143,7 +143,7 @@ export default function Collections() {
     return (
         <ProtectedRoute>
 
-            <div>
+            <div className="dark:bg-gray-900">
                 <CollectionsPage/>
             </div>
         </ProtectedRoute>

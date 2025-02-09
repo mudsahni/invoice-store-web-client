@@ -16,6 +16,8 @@ export interface NewCollectionContextType {
     setSuccess: React.Dispatch<React.SetStateAction<string>>
     error: string
     setError: React.Dispatch<React.SetStateAction<string>>
+    showError: boolean
+    setShowError: React.Dispatch<React.SetStateAction<boolean>>
     isProcessing: boolean
     setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>,
     createCollectionEvents: CollectionStatusEvent[],

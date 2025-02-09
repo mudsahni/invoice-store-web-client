@@ -9,5 +9,12 @@ export const API_ENDPOINTS = {
     },
     USERS: {
         GET: (id: string) => `/users/${id}`,
+    },
+    DOCUMENTS: {
+        CREATE: '/documents',
+        GET: (id: string) => `/documents/${id}`,
+        LIST: '/documents',
+        DELETE: (id: string) => `/documents/${id}`,
+        DOWNLOAD: (id: string) => `/documents/${id}/download`,
     }
 } as const;

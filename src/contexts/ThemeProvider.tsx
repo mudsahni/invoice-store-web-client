@@ -1,7 +1,7 @@
 // contexts/ThemeProvider.tsx
 'use client'
 
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, {createContext, useContext, useEffect, useState} from 'react'
 
 type Theme = 'dark' | 'light'
 
@@ -12,8 +12,8 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const [theme, setTheme] = useState<Theme>('dark')
+export function ThemeProvider({children}: { children: React.ReactNode }) {
+    const [theme, setTheme] = useState<Theme>('light')
 
     useEffect(() => {
         // Get initial theme from localStorage or default to 'dark'
@@ -31,7 +31,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
 
     return (
-        <ThemeContext.Provider value={{ theme, setTheme: handleThemeChange }}>
+        <ThemeContext.Provider value={{theme, setTheme: handleThemeChange}}>
             {children}
         </ThemeContext.Provider>
     )

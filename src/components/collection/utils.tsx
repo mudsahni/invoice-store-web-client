@@ -2,15 +2,14 @@ import {CollectionStatus, CollectionWithDocuments} from "@/types/collections";
 import React from 'react'
 import {CheckCircleIcon} from '@heroicons/react/20/solid'
 import {LoadingSpinner} from "@/components/LoadingSpinner";
-import ReactDOM from 'react-dom';
 
-const CACHE_PREFIX = "collection_"
+const COLLECTION_CACHE_PREFIX = "collection_"
 // Cache configuration
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
+const COLLECTION_CACHE_TTL = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const clearCache = (collectionId: string) => {
     try {
-        localStorage.removeItem(CACHE_PREFIX + collectionId);
+        localStorage.removeItem(COLLECTION_CACHE_PREFIX + collectionId);
     } catch (err) {
         console.error('Error clearing cache:', err);
     }
@@ -24,7 +23,7 @@ interface CollectionCacheData {
 // Cache utility functions
 export const getCollectionCachedData = (collectionId: string): CollectionCacheData | null => {
     try {
-        const cached = localStorage.getItem(CACHE_PREFIX + collectionId);
+        const cached = localStorage.getItem(COLLECTION_CACHE_PREFIX + collectionId);
         return cached ? JSON.parse(cached) : null;
     } catch (err) {
         console.error('Error reading from cache:', err);
@@ -38,7 +37,7 @@ export const setCollectionCachedData = (collectionId: string, collectionWithDocu
             timestamp: Date.now(),
             collectionWithDocuments: collectionWithDocuments
         };
-        localStorage.setItem(CACHE_PREFIX + collectionId, JSON.stringify(cacheData));
+        localStorage.setItem(COLLECTION_CACHE_PREFIX + collectionId, JSON.stringify(cacheData));
     } catch (err) {
         console.error('Error writing to cache:', err);
     }
@@ -48,7 +47,7 @@ export const isCollectionCacheValid = (cacheData: CollectionCacheData): boolean 
     if (cacheData.collectionWithDocuments.status !== CollectionStatus.COMPLETED) {
         return false
     }
-    if (Date.now() - cacheData.timestamp < CACHE_TTL) {
+    if (Date.now() - cacheData.timestamp < COLLECTION_CACHE_TTL) {
         return true
     } else {
         clearCache(cacheData.collectionWithDocuments.id)
@@ -99,19 +98,3 @@ export const CollectionStatusComponent: React.FC<CollectionStatusComponentProps>
     }
     return <InProgressBadge size={size}/>
 }
-
-interface PortalProps {
-    children: React.ReactNode;
-}
-
-export const Portal: React.FC<PortalProps> = ({children}) => {
-    const [mounted, setMounted] = React.useState(false);
-
-    React.useEffect(() => {
-        setMounted(true);
-    }, []);
-
-    if (!mounted) return null;
-
-    return ReactDOM.createPortal(children, document.body);
-};

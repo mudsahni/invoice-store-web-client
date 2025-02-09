@@ -8,11 +8,12 @@ import {
 import React, {useState} from "react";
 import {UserData} from "@/types/auth";
 import {userService} from "@/services/userService";
-import {getCollectionCachedData, isCollectionCacheValid, setCollectionCachedData} from "@/components/collection/utils";
 import {DocumentTable} from "@/components/collection/DocumentTable";
 import {CollectionMetadata} from "@/components/collection/CollectionMetadata";
 import {LoadingSpinner} from "@/components/LoadingSpinner";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
+import {CacheManager} from "@/services/cacheManager";
+import Content from "@/components/ui/Content";
 
 
 interface CollectionPageProps {
@@ -20,6 +21,18 @@ interface CollectionPageProps {
 }
 
 const DOCUMENT_COLS = ["Name", "Type", "Status", ""]
+
+const collectionCache = new CacheManager<CollectionWithDocuments>({
+    prefix: 'collection',
+    ttl: 5 * 60 * 1000, // 5 minutes
+    validator: (data) => data.status === 'COMPLETED'
+});
+
+const documentToCollectionMapCache = new CacheManager<string>({
+    prefix: 'documentToCollectionMap',
+    ttl: 50 * 60 * 1000, // 50 minutes
+    validator: (data) => localStorage.get(`collection_${data}`) !== null
+})
 
 const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -57,14 +70,17 @@ const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
         const initialize = async () => {
             try {
                 setIsLoading(true);
-                const cachedData = getCollectionCachedData(id);
-                if (cachedData && isCollectionCacheValid(cachedData)) {
-                    setCollection(cachedData.collectionWithDocuments);
-                    setLastUpdated(new Date(cachedData.timestamp));
+                const cachedData = collectionCache.get(id);
+                if (cachedData) {
+                    setCollection(cachedData.data);
+                    setLastUpdated(new Date(cachedData.timestamp))
                 } else {
                     const fetchedCollection = await collectionsService.getCollection(id);
                     setCollection(fetchedCollection);
-                    setCollectionCachedData(id, fetchedCollection)
+                    collectionCache.set(id, fetchedCollection)
+                    Object.entries(fetchedCollection.documents).forEach(([docId]) => {
+                        documentToCollectionMapCache.set(docId, id)
+                    })
                     if (!fetchedCollection || fetchedCollection.status !== CollectionStatus.COMPLETED) {
                         console.log("Collection doesn't exist, starting event listening");
                         eventUnsubscribe = await listenToCollectionStatusEvents(id);
@@ -100,37 +116,20 @@ const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
     }
 
     return (
-        <div>
-            <div className="max-w-7xl mx-auto px-8">
-                <Breadcrumbs pages={[
-                    {name: 'Collections', href: '/collections', current: false},
-                    {name: collection?.name || 'Loading...', href: `#`, current: true}
-                ]}/>
-            </div>
-            {!collection ? (
-                createCollectionEvents.map((event, index) => (
-                    <div key={index}>
-                        <span>{event.id}</span>
-                        <span>{event.status}</span>
-                        <span>{event.type}</span>
-                        <div>
-                            {Object.entries(event.documents).map(([key, value], docIndex) => (
-                                <div key={`${index}-${docIndex}`}>
-                                    <span>{key}</span>
-                                    <span>{value}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                ))
-            ) : (
-                <div>
+        <Content className="space-y-8">
+            <Breadcrumbs pages={[
+                {name: 'Collections', href: '/collections', current: false},
+                {name: collection?.name || 'Loading...', href: `#`, current: true}
+            ]}/>
+
+            {collection &&
+                <>
                     <CollectionMetadata collection={collection}/>
 
                     <DocumentTable documents={collection.documents}/>
-                </div>
-            )}
-        </div>
+                </>
+            }
+        </Content>
     )
 }
 

@@ -1,13 +1,13 @@
 import React, {ReactNode, useState} from "react";
 import {PDFFile, ProcessedData} from "@/components/collections/PDFFile";
-import { NewCollectionContext } from "./NewCollectionContext";
+import {NewCollectionContext} from "./NewCollectionContext";
 import {CollectionStatusEvent} from "@/types/collections";
 
 export interface NewCollectionContextProviderProps {
     children: ReactNode;
 }
 
-export const NewCollectionContextProvider: React.FC<NewCollectionContextProviderProps> = ({ children }) => {
+export const NewCollectionContextProvider: React.FC<NewCollectionContextProviderProps> = ({children}) => {
     const [pdfFiles, setPdfFiles] = useState<PDFFile[]>([]);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -16,6 +16,7 @@ export const NewCollectionContextProvider: React.FC<NewCollectionContextProvider
     const [collectionName, setCollectionName] = useState<string>('');
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [createCollectionEvents, setCreateCollectionEvents] = useState<CollectionStatusEvent[]>([]);
+    const [showError, setShowError] = useState<boolean>(false);
 
     const value = {
         pdfFiles,
@@ -33,7 +34,9 @@ export const NewCollectionContextProvider: React.FC<NewCollectionContextProvider
         isProcessing,
         setIsProcessing,
         createCollectionEvents,
-        setCreateCollectionEvents
+        setCreateCollectionEvents,
+        showError,
+        setShowError,
     };
 
     return (

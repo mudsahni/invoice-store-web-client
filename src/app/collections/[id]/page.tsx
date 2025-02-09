@@ -13,9 +13,7 @@ export default async function Collection(
 
     return (
         <ProtectedRoute>
-            <div className="py-8">
-                <CollectionPage id={params.id}/>
-            </div>
+            <CollectionPage id={params.id}/>
         </ProtectedRoute>
     );
 }

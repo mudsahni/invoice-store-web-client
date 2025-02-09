@@ -48,38 +48,12 @@ const DEFAULT_OPTIONS_MENU_ITEMS = [
 ]
 
 interface OptionsMenuProps {
-    menuItems?: React.ReactNode[];
+    menuItems?: React.JSX.Element[];
     menuName: string;
 }
 
 export const OptionsMenu: React.FC<OptionsMenuProps> = ({menuItems, menuName}) => {
     const menuItemsToRender = menuItems || DEFAULT_OPTIONS_MENU_ITEMS;
-    // React.useEffect(() => {
-    //     const updateMenuPosition = (event: Event) => {
-    //         const button = event.currentTarget as HTMLElement;
-    //         const rect = button.getBoundingClientRect();
-    //         document.documentElement.style.setProperty(
-    //             '--menu-position-right',
-    //             `${window.innerWidth - rect.right}px`
-    //         );
-    //         document.documentElement.style.setProperty(
-    //             '--menu-position-top',
-    //             `${rect.bottom + window.scrollY}px`
-    //         );
-    //     };
-    //
-    //     const buttons = document.querySelectorAll('.menu-button');
-    //     buttons.forEach(button => {
-    //         button.addEventListener('click', updateMenuPosition as EventListener);
-    //     });
-    //
-    //     return () => {
-    //         buttons.forEach(button => {
-    //             button.removeEventListener('click', updateMenuPosition as EventListener);
-    //         });
-    //     };
-    // }, []);
-    //
     return <Menu as="div" className="relative inline-block text-left">
         <div>
             <MenuButton

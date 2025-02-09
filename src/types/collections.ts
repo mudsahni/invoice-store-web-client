@@ -151,3 +151,13 @@ export interface CollectionWithDocuments {
     updatedAt?: { seconds: number; nanos: number };
     updatedBy?: string;
 }
+
+export interface DownloadDocumentResponse {
+    documentId: string,
+    collectionId: string,
+    tenantId: string,
+    fileName: string,
+    fileType: string,
+    ttl: number,
+    downloadUrl: string
+}
