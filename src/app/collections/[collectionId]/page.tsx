@@ -5,7 +5,7 @@ import ProtectedRoute from "@/contexts/ProtectedRoute";
 
 export default async function Collection(
     props: {
-        params: Promise<{ id: string }>;
+        params: Promise<{ collectionId: string }>;
     }
 ) {
 
@@ -13,7 +13,7 @@ export default async function Collection(
 
     return (
         <ProtectedRoute>
-            <CollectionPage id={params.id}/>
+            <CollectionPage id={params.collectionId}/>
         </ProtectedRoute>
     );
 }

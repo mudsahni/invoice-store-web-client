@@ -28,12 +28,6 @@ const collectionCache = new CacheManager<CollectionWithDocuments>({
     validator: (data) => data.status === 'COMPLETED'
 });
 
-const documentToCollectionMapCache = new CacheManager<string>({
-    prefix: 'documentToCollectionMap',
-    ttl: 50 * 60 * 1000, // 50 minutes
-    validator: (data) => localStorage.get(`collection_${data}`) !== null
-})
-
 const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
     const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
     const [collection, setCollection] = useState<CollectionWithDocuments | undefined>();
@@ -78,9 +72,6 @@ const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
                     const fetchedCollection = await collectionsService.getCollection(id);
                     setCollection(fetchedCollection);
                     collectionCache.set(id, fetchedCollection)
-                    Object.entries(fetchedCollection.documents).forEach(([docId]) => {
-                        documentToCollectionMapCache.set(docId, id)
-                    })
                     if (!fetchedCollection || fetchedCollection.status !== CollectionStatus.COMPLETED) {
                         console.log("Collection doesn't exist, starting event listening");
                         eventUnsubscribe = await listenToCollectionStatusEvents(id);
@@ -117,10 +108,7 @@ const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
 
     return (
         <Content className="space-y-8">
-            <Breadcrumbs pages={[
-                {name: 'Collections', href: '/collections', current: false},
-                {name: collection?.name || 'Loading...', href: `#`, current: true}
-            ]}/>
+            <Breadcrumbs/>
 
             {collection &&
                 <>

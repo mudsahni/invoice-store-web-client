@@ -108,9 +108,7 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
     return (
         <Content className="dark:bg-gray-800 rounded-xl">
 
-            <Breadcrumbs pages={[
-                {name: 'Collections', href: '/collections', current: true},
-            ]}/>
+            <Breadcrumbs/>
             <CollectionsPageHeader/>
             <div className="flex flex-col sm:flex-row justify-between gap-4">
                 <button

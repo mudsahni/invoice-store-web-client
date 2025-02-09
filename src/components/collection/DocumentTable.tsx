@@ -3,14 +3,14 @@ import {CollectionDocument} from "@/types/collections";
 import {
     DocumentTextIcon,
     ChevronDownIcon,
-    PencilSquareIcon,
-    ArrowDownTrayIcon,
-    ArchiveBoxXMarkIcon, ArrowPathIcon
 } from '@heroicons/react/20/solid'
 import {OptionsMenu} from "@/components/collection/OptionsMenu";
 import {JsonView, allExpanded, defaultStyles, darkStyles} from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
 import {StyleProps} from "react-json-view-lite/dist/DataRenderer";
+import {getOptionsMenu} from "@/components/collection/utils";
+import {documentService} from "@/services/documentService";
+import {CacheManager} from "@/services/cacheManager";
 
 export interface DocumentTableProps {
     documents: Record<string, CollectionDocument>
@@ -31,61 +31,67 @@ const DOCUMENT_TABLE_COLS = [
     ""
 ]
 
-const MENU_ITEM_BOX_CLASSES = "px-4 py-2 flex align-middle items-center data-[focus]:bg-sky-100 data-[focus]:text-sky-700 data-[focus]:outline-none"
-const MENU_ITEM_CLASSES = "text-sm text-sky-700"
-
-const getOptionsMenu = (id: string) => [
-    <a
-        className={MENU_ITEM_BOX_CLASSES}
-        href={`/invoices/${id}`}
-    >
-        <PencilSquareIcon className="h-4 mr-2 text-sky-700"/>
-        <span className={MENU_ITEM_CLASSES}>
-      Review and Edit
-    </span>
-    </a>,
-    <a
-        className={MENU_ITEM_BOX_CLASSES}
-        href="#"
-    >
-        <ArrowDownTrayIcon className="h-4 mr-2 text-sky-700"/>
-        <span className={MENU_ITEM_CLASSES}>
-       Download File
-    </span>
-    </a>,
-    <a
-        className={MENU_ITEM_BOX_CLASSES}
-        href="#"
-    >
-        <ArchiveBoxXMarkIcon className="h-4 mr-2 text-sky-700"/>
-        <span className={MENU_ITEM_CLASSES}>
-      Delete Document
-    </span>
-    </a>,
-    <a
-        className={MENU_ITEM_BOX_CLASSES}
-        href="#"
-    >
-        <ArrowPathIcon className="h-4 mr-2 text-sky-700"/>
-        <span className={MENU_ITEM_CLASSES}>
-     Refresh
-    </span>
-    </a>,
-
-
-]
+const documentDownloadLinkCache = new CacheManager<string>({
+    prefix: 'documentDownloadLink',
+    ttl: 50 * 60 * 1000, // 50 minutes
+})
 
 export const DocumentTable: React.FC<DocumentTableProps> = ({documents}) => {
     const [openRow, setOpenRow] = React.useState<string | null>(null);
+    const [documentDownloadLinks, setDocumentDownloadLinks] = React.useState<Record<string, string>>({});
+    const [optionsMenuItems, setOptionsMenuItems] = React.useState<Record<string, ReturnType<typeof getOptionsMenu>>>({});
 
     const toggleRow = (key: string) => {
         setOpenRow(openRow === key ? null : key);
     };
 
-    const loadedOptionsMenuItems = Object.entries(documents).reduce((acc, [key, value]) => {
-        acc[key] = getOptionsMenu(value.id);
-        return acc;
-    }, {} as Record<string, ReturnType<typeof getOptionsMenu>>);
+    React.useEffect(() => {
+        // first check cache for download links
+        // if the links are present then set them in the state
+        // if the cache doesnt have the links for the document ids here
+        // then fetch the links and save them in the cache and set them in the state
+
+        const documentIds = Object.keys(documents);
+        // create a map of document ids to download links by going through the documentIds and fetching each link one by one
+        const cachedLinks = documentIds.reduce((acc, id) => {
+            const cachedLink = documentDownloadLinkCache.get(id);
+            if (cachedLink) {
+                acc[id] = cachedLink.data;
+            }
+            return acc;
+        }, {} as Record<string, string>);
+
+        // get the missing document ids
+        const missingDocumentIds = documentIds.filter((id) => !cachedLinks[id]);
+
+        if (missingDocumentIds.length > 0) {
+            missingDocumentIds.forEach((id) => {
+                documentService.getDocumentDownloadLink(id)
+                    .then((link) => {
+                        documentDownloadLinkCache.set(id, link.downloadUrl);
+                        setDocumentDownloadLinks((prev) => ({
+                            ...prev,
+                            [id]: link.downloadUrl
+                        }));
+                    })
+                    .catch((err) => {
+                        console.error('Error fetching download link for document:', err);
+                    })
+            })
+        } else {
+            setDocumentDownloadLinks(cachedLinks);
+        }
+
+    }, [documents])
+
+    React.useEffect(() => {
+        const loadedOptionsMenuItems = Object.entries(documents).reduce((acc, [key, value]) => {
+            console.log(`Document download link: ${documentDownloadLinks[key]}`)
+            acc[key] = getOptionsMenu(value.collectionId, value.id, documentDownloadLinks[key]);
+            return acc;
+        }, {} as Record<string, ReturnType<typeof getOptionsMenu>>);
+        setOptionsMenuItems(loadedOptionsMenuItems);
+    }, [documentDownloadLinks, documents])
 
     return (
 
@@ -164,7 +170,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({documents}) => {
                                                     </span>
                                             </td>
                                             <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-base font-medium sm:pr-0">
-                                                <OptionsMenu menuItems={loadedOptionsMenuItems[key]}
+                                                <OptionsMenu menuItems={optionsMenuItems[key]}
                                                              menuName={value.name}/>
                                             </td>
                                         </tr>
@@ -177,7 +183,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({documents}) => {
                                                         <h3 className="text-sky-800 text-sm font-semibold py-2">Raw
                                                             Output</h3>
                                                         <pre
-                                                            className="bg-white rounded-xl p-4 rounded-lg overflow-auto">
+                                                            className="bg-white rounded-xl p-4 overflow-auto">
                                                                 {<JsonView data={JSON.parse(value.data.raw || "{}")}
                                                                            shouldExpandNode={allExpanded}
                                                                            style={customJsonViewStyles}/>}

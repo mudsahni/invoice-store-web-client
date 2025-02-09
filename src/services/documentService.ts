@@ -14,12 +14,21 @@ export class DocumentsService {
 
     }
 
-    async downloadDocument(
+    async getDocumentDownloadLink(
         id: string
     ): Promise<DownloadDocumentResponse> {
 
         return await apiClient.get<DownloadDocumentResponse>(
             API_ENDPOINTS.DOCUMENTS.DOWNLOAD(id)
+        );
+    }
+
+    async validateDocument(
+        id: string
+    ): Promise<{ [key: string]: { field: string, message: string } }> {
+
+        return await apiClient.get<{ [key: string]: { field: string, message: string } }>(
+            API_ENDPOINTS.DOCUMENTS.VALIDATE(id)
         );
 
     }

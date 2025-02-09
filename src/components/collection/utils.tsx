@@ -1,6 +1,12 @@
 import {CollectionStatus, CollectionWithDocuments} from "@/types/collections";
 import React from 'react'
-import {CheckCircleIcon} from '@heroicons/react/20/solid'
+import {
+    ArchiveBoxXMarkIcon,
+    ArrowDownTrayIcon,
+    ArrowPathIcon,
+    CheckCircleIcon,
+    PencilSquareIcon
+} from '@heroicons/react/20/solid'
 import {LoadingSpinner} from "@/components/LoadingSpinner";
 
 const COLLECTION_CACHE_PREFIX = "collection_"
@@ -98,3 +104,49 @@ export const CollectionStatusComponent: React.FC<CollectionStatusComponentProps>
     }
     return <InProgressBadge size={size}/>
 }
+
+const MENU_ITEM_BOX_CLASSES = "px-4 py-2 flex align-middle items-center data-[focus]:bg-sky-100 data-[focus]:text-sky-700 data-[focus]:outline-none"
+const MENU_ITEM_CLASSES = "text-sm text-sky-700"
+
+export const getOptionsMenu = (collectionId: string, documentId: string, downloadLink: string) => [
+    <a
+        className={MENU_ITEM_BOX_CLASSES}
+        href={`/collections/${collectionId}/${documentId}`}
+    >
+        <PencilSquareIcon className="h-4 mr-2 text-sky-700"/>
+        <span className={MENU_ITEM_CLASSES}>
+      Review and Edit
+    </span>
+    </a>,
+    <a
+        className={MENU_ITEM_BOX_CLASSES}
+        href={`${downloadLink}`}
+        target={"_blank"}
+    >
+        <ArrowDownTrayIcon className="h-4 mr-2 text-sky-700"/>
+        <span className={MENU_ITEM_CLASSES}>
+       Download File
+    </span>
+    </a>,
+    <a
+        className={MENU_ITEM_BOX_CLASSES}
+        href="#"
+    >
+        <ArchiveBoxXMarkIcon className="h-4 mr-2 text-sky-700"/>
+        <span className={MENU_ITEM_CLASSES}>
+      Delete Document
+    </span>
+    </a>,
+    <a
+        className={MENU_ITEM_BOX_CLASSES}
+        href="#"
+    >
+        <ArrowPathIcon className="h-4 mr-2 text-sky-700"/>
+        <span className={MENU_ITEM_CLASSES}>
+     Refresh
+    </span>
+    </a>,
+
+
+]
+
