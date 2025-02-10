@@ -44,10 +44,9 @@ const collectionsCache = new CacheManager<GetCollectionResponse[]>({
 
 
 export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
-    const [browseCollections, setBrowseCollections] = React.useState<boolean>(false)
     const [createNewCollection, setCreateNewCollection] = React.useState<boolean>(true)
     const [collections, setCollections] = React.useState<GetCollectionResponse[]>([])
-    const [loadCollections, setLoadCollections] = React.useState<boolean>(false)
+    const [loadCollections, setLoadCollections] = React.useState<boolean>(true)
     const router = useRouter();
 
     const handleRefresh = async () => {
@@ -63,7 +62,6 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
 
     const getCollections = async () => {
         try {
-            setBrowseCollections(true)
             setLoadCollections(true)
             const cachedData = collectionsCache.get('user_collections'); // or any appropriate ID
             if (cachedData) {
@@ -84,6 +82,11 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
             setLoadCollections(false);
         }
     }
+
+    React.useEffect(() => {
+        getCollections()
+
+    }, [])
 
     const routeToCollection = (collectionId: string) => {
         router.push(`/collections/${collectionId}`)
