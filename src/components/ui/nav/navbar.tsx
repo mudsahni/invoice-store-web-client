@@ -1,4 +1,4 @@
-import { Disclosure } from '@headlessui/react'
+import {Disclosure} from '@headlessui/react'
 import {usePathname} from "next/navigation";
 import {useAuth} from "@/contexts/AuthContext";
 import React from "react";
@@ -15,11 +15,11 @@ const Navigation = () => {
     // const isActive = (path: string) => pathname === path;
 
     return (
-        <Disclosure as="nav">
-                <>
-                    <WebNavigation navigation={NAVIGATION_ITEMS} pathname={pathname} user={authUser} />
-                    <MobileNavigation navigation={NAVIGATION_ITEMS} pathname={pathname} user={authUser} />
-                </>
+        <Disclosure as="nav" className="border-b pb-4">
+            <>
+                <WebNavigation navigation={NAVIGATION_ITEMS} pathname={pathname} user={authUser}/>
+                <MobileNavigation navigation={NAVIGATION_ITEMS} pathname={pathname} user={authUser}/>
+            </>
         </Disclosure>
     )
 

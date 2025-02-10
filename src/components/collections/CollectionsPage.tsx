@@ -16,22 +16,6 @@ import {CreateNewCollection} from "@/components/collections/CreateNewCollection"
 import {CacheManager} from "@/services/cacheManager";
 import Content from "@/components/ui/Content";
 
-const CollectionsPageHeader: React.FC = () => {
-    return (
-        <div className="bg-transparent rounded-xl my-8">
-            <div className="flex px-0 align-middle items-center">
-                <FolderOpenIcon className="h-6 mr-4 dark:text-gray-200 text-gray-800"/>
-                <span className="text-2xl/7 dark:text-gray-200 text-gray-800 font-medium">Document Collections</span>
-            </div>
-            <p className="py-4 dark:text-gray-400 text-gray-600 text-base text-justify font-medium">
-                A collection is a set of documents grouped together because of the being uploaded together and/or
-                sharing a common trait between them. This page will allow you to create a new collection, view existing
-                collections which you previously created
-                or are shared with you, and manage the documents within each collection.
-            </p>
-        </div>
-    )
-}
 
 export interface CollectionsPageProps {
 
@@ -105,80 +89,51 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
         router.push(`/collections/${collectionId}`)
     }
 
+    const CollectionsPageHeader: React.FC = () => {
+        return (
+            <div className="bg-transparent rounded-xl my-8">
+                <div className="flex px-0 align-middle items-center justify-between">
+                <span
+                    className="sm:text-8xl text-6xl dark:text-gray-200 text-gray-800 font-bold">Collections</span>
+                    <button
+                        onClick={() => setCreateNewCollection(true)}
+                        className={`${createNewCollection ? 'bg-blue-600 bg-opacity-45 pointer-events-none' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'} sm:p-4 p-3 rounded-lg mt-4 group`}>
+                        <div className="flex items-center">
+                            <FolderPlusIcon className="sm:h-6 h-6 text-white"/>
+                            <span
+                                className="lg:block hidden text-white font-semibold ml-4">
+                            Create Collection
+                        </span>
+                        </div>
+                    </button>
+                </div>
+                <p className="py-4 dark:text-gray-400 text-gray-600 text-base text-justify font-medium">
+                    A collection is a set of documents grouped together because of the being uploaded together and/or
+                    sharing a common trait between them. This page will allow you to create a new collection, view
+                    existing
+                    collections which you previously created
+                    or are shared with you, and manage the documents within each collection.
+                </p>
+            </div>
+        )
+    }
+
     return (
         <Content className="dark:bg-gray-800 rounded-xl">
 
             <Breadcrumbs/>
             <CollectionsPageHeader/>
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
-                <button
-                    title="Click to create a new collection."
-                    type="button"
-                    onClick={() => setCreateNewCollection(true)}
-                    className={`group w-full sm:flex-1 ${createNewCollection ? 'dark:bg-gray-900 bg-gray-100 dark:text-gray-500 text-gray-600 dark:border-gray-500 border-gray-500 pointer-events-none' : 'bg-blue-600 text-blue-50 border-blue-600 hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500'} inline-flex gap-x-1.5 rounded-lg border-2 px-4 py-3 text-lg shadow-sm`}
-                >
-
-                    <div className="w-full text-left">
-                        <div className="flex align-middle items-center pb-8">
-                            <FolderPlusIcon aria-hidden="true" className="mr-2 size-5"/>
-                            <span className="text-base font-semibold">Create New Collection</span>
-                        </div>
-                        <div>
-                            <p className={`text-base ${createNewCollection ? 'text-gray-500' : 'text-blue-100'} font-medium`}>Click
-                                here to create
-                                a new
-                                collection of your
-                                choice by
-                                selecting
-                                documents which you want to
-                                upload and structure into parsable data.</p>
-                        </div>
-                    </div>
-                    <div>
-                        <PlusIcon aria-hidden="true"
-                                  className="size-5 group-hover:scale-[1.5] transition-transform duration-500"/>
-                    </div>
-                </button>
-
-                <button
-                    title="Click to view your collections."
-                    type="button"
-                    onClick={() => getCollections()}
-                    className={`group w-full sm:flex-1 ${browseCollections ? 'dark:bg-gray-900 bg-gray-100 dark:text-gray-500 text-gray-600 dark:border-gray-500 border-neutral-500 pointer-events-none' : 'bg-blue-600 text-blue-50 border-blue-600 hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500'} inline-flex gap-x-1.5 rounded-lg border-2 px-4 py-3 text-lg shadow-sm`}
-                >
-
-                    <div className="w-full text-left">
-                        <div className="flex align-middle items-center pb-8">
-                            <FolderOpenIcon aria-hidden="true" className="mr-2 size-5"/>
-                            <span className="text-base font-semibold">Browse Your Collections</span>
-                        </div>
-                        <div>
-                            <p className={`text-base ${browseCollections ? 'text-gray-500' : 'text-blue-100'} font-medium`}>Click
-                                Click here to view all the collections you have created previously. You can also drill
-                                down and see collection details.</p>
-                        </div>
-                    </div>
-                    <div className="relative">
-                        <MagnifyingGlassIcon
-                            aria-hidden="true"
-                            className="size-5 relative z-10 group-hover:scale-[1.5] transition-transform duration-500"
-                        />
-
-                    </div>
-                </button>
-            </div>
             {
                 createNewCollection && <CreateNewCollection setCreateNewCollection={setCreateNewCollection}/>
             }
-            {
-                browseCollections && <YourCollectionsTable
-                    setBrowseCollections={setBrowseCollections}
-                    routeToCollection={routeToCollection}
-                    collections={collections}
-                    loadCollections={loadCollections}
-                    handleRefresh={handleRefresh}
-                />
-            }
+
+            <YourCollectionsTable
+                routeToCollection={routeToCollection}
+                collections={collections}
+                loadCollections={loadCollections}
+                handleRefresh={handleRefresh}
+            />
+
         </Content>
     )
 }

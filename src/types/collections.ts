@@ -106,7 +106,8 @@ export interface Collection {
 
 export interface StructuredData {
     raw?: string;
-    structured?: InvoiceWrapper
+    structured?: InvoiceWrapper;
+    errors?: { [key: string]: { field: string, message: string } }
 }
 
 export interface DocumentError {

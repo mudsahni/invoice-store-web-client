@@ -34,6 +34,14 @@ export default {
                 'bounce-x': 'bounce-x 1s infinite',
                 dots: 'dots 2s steps(4, end) infinite',
             },
+            colors: {
+                'cream': '#F4F2ED',
+                'graphite-a': '#242424',
+                'graphite-b': '#252525',
+                'graphite-c': '#262626',
+                'graphite-d': '#272727',
+                'graphite-e': '#282828',
+            }
         }
     },
     plugins: [require("tailwindcss-animate")],

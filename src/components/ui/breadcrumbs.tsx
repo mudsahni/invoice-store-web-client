@@ -68,7 +68,7 @@ export const Breadcrumbs: React.FC = () => {
                 {breadcrumbs.map((page) => (
                     <li key={page.href}>
                         <div className="flex items-center">
-                            <ChevronRightIcon className="h-4 dark:text-gray-200 text-gray-800"/>
+                            <ChevronRightIcon className="h-4 dark:text-gray-200 text-gray-800 text-opacity-80"/>
                             <Link
                                 href={page.href}
                                 aria-current={page.current ? 'page' : undefined}

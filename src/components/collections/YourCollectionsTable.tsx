@@ -1,11 +1,11 @@
 import React from 'react'
-import {ArrowPathIcon, ChevronRightIcon, FolderOpenIcon} from "@heroicons/react/20/solid";
-import {ChevronLeftIcon, XCircleIcon} from "lucide-react";
+import {ArrowPathIcon, ChevronRightIcon} from "@heroicons/react/20/solid";
+import {ChevronLeftIcon} from "lucide-react";
 import {LoadingSpinner} from "@/components/LoadingSpinner";
 import {getStatusStyles} from "@/components/collections/utils";
+import {FaceFrownIcon} from "@heroicons/react/24/outline";
 
 interface YourCollectionsTableProps {
-    setBrowseCollections: (value: boolean) => void
     routeToCollection: (id: string) => void
     collections: any[]
     loadCollections: boolean
@@ -14,7 +14,6 @@ interface YourCollectionsTableProps {
 
 
 export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
-                                                                              setBrowseCollections,
                                                                               routeToCollection,
                                                                               collections,
                                                                               loadCollections,
@@ -44,31 +43,25 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
     };
 
     return (
-        <div className="dark:bg-gray-800 dark:border-2 dark:border-gray-700 bg-neutral-50 sm:p-8 p-4 rounded-xl">
-            <div className="flex justify-between">
-                <div className="flex items-center align-middle">
-                    <FolderOpenIcon className="h-6 mr-4 dark:text-gray-200 text-sky-800"/>
+        <div
+            className="dark:bg-gray-800 dark:border-2 dark:border-gray-700 bg-neutral-50 sm:p-8 p-4 rounded-xl min-h-[50vh]">
+            <div className="flex w-full h-full justify-between align-middle items-center mb-8">
+                <span className="text-gray-700 font-bold sm:text-4xl text-3xl">Browse Collections</span>
+                <div
+                    className={`${loadCollections ? 'bg-blue-600 bg-opacity-45' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'} text-white group rounded-md p-2 group overflow-hidden transition-all duration-300 font-semibold sm:text-sm mx-4 text-xs flex justify-center align-middle items-center`}
+                    onClick={handleRefresh}
+                >
+                    <ArrowPathIcon
+                        className='h-6'/>
                     <span
-                        className="text-2xl/7 dark:text-gray-200 text-sky-800 font-medium">Your Collections</span>
-                </div>
-                <div className="flex justify-end align-middle items-center">
-                    <div
-                        className={`${loadCollections ? 'dark:bg-gray-400' : 'dark:bg-gray-200 bg-gray-800 dark:hover:bg-gray-100 hover:bg-gray-900 dark:text-gray-800 text-gray-200 cursor-pointer'} group font-medium rounded-md py-1 px-2 sm:text-sm mx-4 text-xs flex justify-center align-middle items-center`}
-                        onClick={handleRefresh}
-                    >
-                        <ArrowPathIcon
-                            className={` h-4 sm:mr-2 `}/>
-                        <span className="sm:block hidden">Refresh</span>
-                    </div>
-                    <XCircleIcon
-                        className="dark:text-gray-200 dark:hover:text-gray-100 hover:scale-105 text-sky-700 h-6 hover:text-sky-900 cursor-pointer"
-                        onClick={() => setBrowseCollections(false)}/>
+                        className="sm:block text-base hidden overflow-hidden w-0 group-hover:w-[4rem] transition-all duration-300 whitespace-nowrap opacity-0 group-hover:opacity-100 ml-0 group-hover:ml-2">Refresh</span>
                 </div>
             </div>
-            <p className="text-base font-medium dark:text-gray-400 text-sky-700 py-8">All your collections in
-                one place.</p>
             {loadCollections ?
-                <div className="w-full flex justify-center align-middle text-center"><LoadingSpinner size={6}/>
+                <div className="w-full h-[50vh] flex justify-center align-bottom text-center">
+                    <div className="flex flex-col align-middle justify-center items-center">
+                        <LoadingSpinner size={9} className={"text-gray-200 fill-gray-400"}/>
+                    </div>
                 </div> :
                 collections.length > 0 ?
                     <>
@@ -82,30 +75,30 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                                     <col className="sm:w-1/5"/>
                                 </colgroup>
                                 <thead
-                                    className="border-b dark:border-gray-600 border-neutral-300 dark:text-gray-200 text-sky-900">
-                                <tr>
+                                    className="border-b dark:border-gray-600 border-gray-300 dark:text-gray-200 text-gray-800">
+                                <tr className="text-sm font-semibold">
                                     <th scope="col"
-                                        className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold sm:pl-0">
+                                        className="py-3.5 pl-4 pr-3 text-left sm:pl-0">
                                         Name
                                     </th>
                                     <th
                                         scope="col"
-                                        className="hidden px-3 py-3.5 text-right text-sm font-semibold sm:table-cell"
+                                        className="hidden px-3 py-3.5 text-right sm:table-cell"
                                     >
                                         Last Updated
                                     </th>
                                     <th
                                         scope="col"
-                                        className="hidden px-3 py-3.5 text-right text-sm font-semibold sm:table-cell"
+                                        className="hidden px-3 py-3.5 text-right sm:table-cell"
                                     >
                                         Type
                                     </th>
                                     <th scope="col"
-                                        className="hidden sm:table-cell py-3.5 pl-3 pr-4 text-right text-sm font-semibold sm:pr-0">
+                                        className="hidden sm:table-cell py-3.5 pl-3 pr-4 text-right sm:pr-0">
                                         Status
                                     </th>
                                     <th scope="col"
-                                        className="py-3.5 pl-3 pr-4 text-right text-sm font-semibold sm:pr-0">
+                                        className="py-3.5 pl-3 pr-4 text-right sm:pr-0">
                                         <span className="sr-only">Go to collection</span>
                                     </th>
 
@@ -117,18 +110,18 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                                         title="Click to view this collection."
                                         key={collection.id}
                                         onClick={() => routeToCollection(collection.id)}
-                                        className="group border-b dark:hover:bg-gray-900 hover:bg-neutral-100 dark:border-gray-700 border-neutral-200 cursor-pointer"
+                                        className="group border-b dark:hover:bg-gray-900 hover:bg-gray-100 dark:border-gray-700 border-gray-200 cursor-pointer"
                                     >
                                         <td className={`max-w-0 py-5 pl-4 pr-3 text-sm sm:pl-0 sm:border-0 border-l-2 ${getStatusStyles(collection.status).border}`}>
                                             <div
-                                                className="font-semibold truncate dark:text-gray-300 text-sky-800 ml-1">{collection.name}</div>
+                                                className="font-semibold truncate dark:text-gray-300 text-gray-700 ml-1">{collection.name}</div>
                                             <div
-                                                className="mt-1 truncate dark:text-gray-400 text-sky-800 text-opacity-80 ml-1">Id: {collection.id}
+                                                className="mt-1 truncate dark:text-gray-400 text-gray-600 text-opacity-80 ml-1">Id: {collection.id}
                                             </div>
-                                            <em className="dark:text-gray-500 truncate text-sky-900 text-opacity-60 ml-1">Created
+                                            <em className="dark:text-gray-500 truncate text-gray-500 text-opacity-60 ml-1">Created
                                                 on: {new Date(collection.createdAt.seconds * 1000).toDateString()}</em>
                                         </td>
-                                        <td className="hidden px-3 py-5 text-right text-sm dark:text-gray-400 text-sky-800 sm:table-cell">
+                                        <td className="hidden px-3 py-5 text-right text-sm dark:text-gray-400 text-gray-800 sm:table-cell">
                                             <em>{collection.updatedAt ? new Date(collection.updatedAt.seconds * 1000).toDateString() :
                                                 'Collection has not been updated.'}</em></td>
                                         <td className="hidden px-3 py-5 text-right text-sm text-sky-800 sm:table-cell">
@@ -159,21 +152,21 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                                 <button
                                     onClick={previousPage}
                                     disabled={currentPage === 1}
-                                    className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold dark:text-gray-200 text-sky-800 disabled:opacity-50"
+                                    className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold dark:text-gray-200 text-gray-800 disabled:opacity-50"
                                 >
                                     Previous
                                 </button>
                                 <button
                                     onClick={nextPage}
                                     disabled={currentPage === totalPages}
-                                    className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold dark:text-gray-200 text-sky-800 disabled:opacity-50"
+                                    className="relative ml-3 inline-flex items-center rounded-md px-3 py-2 text-sm font-semibold dark:text-gray-200 text-gray-800 disabled:opacity-50"
                                 >
                                     Next
                                 </button>
                             </div>
                             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
                                 <div>
-                                    <p className="text-sm dark:text-gray-400 text-sky-800">
+                                    <p className="text-sm dark:text-gray-400 text-gray-800">
                                         Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
                                         <span className="font-medium">
                                         {Math.min(endIndex, collections.length)}
@@ -187,7 +180,7 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                                         <button
                                             onClick={previousPage}
                                             disabled={currentPage === 1}
-                                            className="relative inline-flex items-center rounded-l-md px-2 py-2 dark:text-gray-200 text-sky-800 disabled:opacity-50 dark:hover:bg-gray-700 hover:bg-neutral-100"
+                                            className="relative inline-flex items-center rounded-l-md px-2 py-2 dark:text-gray-200 text-gray-800 disabled:opacity-50 dark:hover:bg-gray-700 hover:bg-neutral-100"
                                         >
                                             <span className="sr-only">Previous</span>
                                             <ChevronLeftIcon className="h-5 w-5" aria-hidden="true"/>
@@ -200,8 +193,8 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                                                 onClick={() => setCurrentPage(index + 1)}
                                                 className={`relative inline-flex items-center px-4 py-2 text-sm font-semibold ${
                                                     currentPage === index + 1
-                                                        ? 'dark:bg-gray-700 bg-neutral-100 dark:text-white text-sky-800'
-                                                        : 'dark:text-gray-200 text-sky-800 dark:hover:bg-gray-700 hover:bg-neutral-100'
+                                                        ? 'dark:bg-gray-700 bg-neutral-100 dark:text-white text-gray-800'
+                                                        : 'dark:text-gray-200 text-gray-800 dark:hover:bg-gray-700 hover:bg-neutral-100'
                                                 }`}
                                             >
                                                 {index + 1}
@@ -211,7 +204,7 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                                         <button
                                             onClick={nextPage}
                                             disabled={currentPage === totalPages}
-                                            className="relative inline-flex items-center rounded-r-md px-2 py-2 dark:text-gray-200 text-sky-800 disabled:opacity-50 dark:hover:bg-gray-700 hover:bg-neutral-100"
+                                            className="relative inline-flex items-center rounded-r-md px-2 py-2 dark:text-gray-200 text-gray-800 disabled:opacity-50 dark:hover:bg-gray-700 hover:bg-gray-100"
                                         >
                                             <span className="sr-only">Next</span>
                                             <ChevronRightIcon className="h-5 w-5" aria-hidden="true"/>
@@ -222,8 +215,13 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                         </div>
 
                     </> :
-                    <em className="dark:text-gray-400 text-sky-800 text-base font-medium">No collections
-                        found.</em>
+                    <div className="w-full h-[50vh] flex items-center align-bottom justify-center">
+                        <div className="flex flex-col align-middle justify-center items-center">
+                            <FaceFrownIcon className="sm:h-16 h-12 text-gray-800 text-opacity-40 mb-4"/>
+                            <em className="text-gray-800 text-opacity-40 text-base font-medium">No collections
+                                were found.</em>
+                        </div>
+                    </div>
             }
         </div>
 

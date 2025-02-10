@@ -1,12 +1,13 @@
 'use client';
 import React, {useState} from 'react'
 import {PlusIcon} from "@heroicons/react/20/solid";
-import {TrashIcon} from "lucide-react";
+import {CrossIcon, TrashIcon} from "lucide-react";
 import {Invoice, TaxCategory} from "@/types/invoice";
 import {documentService} from "@/services/documentService";
 import {CacheManager} from "@/services/cacheManager";
 import {CollectionDocument} from "@/types/collections";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
+import {getDocumentField} from "@/components/invoices/utils";
 
 interface InvoicePageProps {
     // onSubmit: (data: InvoiceWrapper) => void;
@@ -36,6 +37,13 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
     const [loading, setLoading] = useState(true);
     const [downloadLink, setDownloadLink] = useState<string | null>(null);
 
+    const handleValidationRefresh = async () => {
+        console.log("Running the validation")
+        const response = await documentService.validateDocument(invoiceId);
+        console.log("Validation response", response);
+        setValidationErrors(response);
+    }
+
     // Fetch document on mount
     React.useEffect(() => {
 
@@ -50,6 +58,9 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
                     // Safely set invoice data
                     if (documentFromCache.data?.data?.structured?.invoice) {
                         setInvoice(documentFromCache.data.data.structured.invoice);
+                        if (documentFromCache?.data?.data?.errors) {
+                            setValidationErrors(documentFromCache.data.data.errors)
+                        }
                     }
                 } else {
                     console.log("Fetching document from service");
@@ -60,11 +71,12 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
                     // Safely set invoice data
                     if (fetchedDocument?.data?.structured?.invoice) {
                         setInvoice(fetchedDocument.data.structured.invoice);
+                        if (fetchedDocument?.data?.errors) {
+                            setValidationErrors(fetchedDocument.data.errors)
+                        }
                     }
-                }
-                const response = await documentService.validateDocument(invoiceId);
-                console.log(response)
 
+                }
             } catch (error) {
                 console.error('Error fetching document:', error);
                 // Handle error appropriately
@@ -88,6 +100,7 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
 
     const [document, setDocument] = useState<CollectionDocument | {}>({});
     const [invoice, setInvoice] = useState<Invoice>({})
+    const [validationErrors, setValidationErrors] = useState<{ [key: string]: { field: string, message: string } }>({});
 
     const addLineItem = () => {
         setInvoice(prev => ({
@@ -193,12 +206,20 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
                     <div className="flex justify-between items-center align-middle mb-8">
                         <h2 className="text-2xl/7 font-semibold text-gray-800">Document Content</h2>
 
-                        <button
-                            type="submit"
-                            className="text-base px-4 py-2 bg-blue-600 border-2 border-blue-500 font-medium text-blue-50 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                        >
-                            Save
-                        </button>
+                        <div className="flex justify-end space-x-2">
+                            <span
+                                onClick={handleValidationRefresh}
+                                className="text-base px-4 py-2 bg-blue-600 border-2 border-blue-500 font-medium text-blue-50 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                Refresh
+                            </span>
+                            <button
+                                type="submit"
+                                className="text-base px-4 py-2 bg-blue-600 border-2 border-blue-500 font-medium text-blue-50 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            >
+                                Save
+                            </button>
+                        </div>
 
                     </div>
                     <div className="flex-1 overflow-y-auto">
@@ -206,51 +227,51 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
                         {/* Basic Invoice Details */}
                         <div className="space-y-6 mb-8">
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Invoice Number</label>
-                                    <input
-                                        value={invoice.invoiceNumber || ""}
-                                        onChange={(e) => handleInvoiceChange('invoiceNumber', e.target.value)}
-                                        type="text"
-                                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Currency Code</label>
-                                    <input
-                                        value={invoice.currencyCode || ""}
-                                        onChange={(e) => handleInvoiceChange('currencyCode', e.target.value)}
-                                        type="text"
-                                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Billing Date</label>
-                                    <input
-                                        value={invoice.billingDate ? new Date(invoice.billingDate).toISOString().split('T')[0] : ''}
-                                        onChange={(e) => handleInvoiceChange('billingDate', e.target.value)}
-                                        type="date"
-                                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Due Date</label>
-                                    <input
-                                        type="date"
-                                        value={invoice.dueDate ? new Date(invoice.dueDate).toISOString().split('T')[0] : ''}
-                                        onChange={(e) => handleInvoiceChange('dueDate', e.target.value)}
-                                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Place of Supply</label>
-                                    <input
-                                        value={invoice.placeOfSupply || ""}
-                                        onChange={(e) => handleInvoiceChange('placeOfSupply', e.target.value)}
-                                        type="text"
-                                        className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                    />
-                                </div>
+                                {
+                                    getDocumentField(
+                                        'Invoice Number',
+                                        'text',
+                                        handleInvoiceChange,
+                                        invoice.invoiceNumber || "",
+                                        validationErrors['invoice.invoiceNumber']?.message
+                                    )
+                                }
+                                {
+                                    getDocumentField(
+                                        'Currency Code',
+                                        'text',
+                                        handleInvoiceChange,
+                                        invoice.currencyCode || '',
+                                        validationErrors['invoice.currencyCode']?.message
+                                    )
+                                }
+                                {
+                                    getDocumentField(
+                                        'Billing Date',
+                                        'date',
+                                        handleInvoiceChange,
+                                        invoice.billingDate ? new Date(invoice.billingDate).toISOString().split('T')[0] : '',
+                                        validationErrors['invoice.billingDate']?.message
+                                    )
+                                }
+                                {
+                                    getDocumentField(
+                                        'Due Date',
+                                        'date',
+                                        handleInvoiceChange,
+                                        invoice.dueDate ? new Date(invoice.dueDate).toISOString().split('T')[0] : '',
+                                        validationErrors['invoice.dueDate']?.message
+                                    )
+                                }
+                                {
+                                    getDocumentField(
+                                        'Place of Supply',
+                                        'text',
+                                        handleInvoiceChange,
+                                        invoice.placeOfSupply || '',
+                                        validationErrors['invoice.placeOfSupply']?.message
+                                    )
+                                }
                             </div>
                         </div>
                         <hr className="p-2"/>
@@ -260,33 +281,34 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
 
                             <div className="py-4 space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Name</label>
-                                        <input
-                                            value={invoice.customer?.name || ""}
-                                            onChange={(e) => handleInvoiceChange('customer.name', e.target.value)}
-                                            type="text"
-                                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">GST Number</label>
-                                        <input
-                                            value={invoice.customer?.gstNumber || ""}
-                                            onChange={(e) => handleInvoiceChange('customer.gstNumber', e.target.value)}
-                                            type="text"
-                                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">PAN</label>
-                                        <input
-                                            value={invoice.customer?.pan || ""}
-                                            onChange={(e) => handleInvoiceChange('customer.pan', e.target.value)}
-                                            type="text"
-                                            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
-                                        />
-                                    </div>
+                                    {
+                                        getDocumentField(
+                                            'Name',
+                                            'text',
+                                            handleInvoiceChange,
+                                            invoice.customer?.name || "",
+                                            validationErrors['invoice.customer.name']?.message
+                                        )
+                                    }
+                                    {
+                                        getDocumentField(
+                                            'GST Number',
+                                            'text',
+                                            handleInvoiceChange,
+                                            invoice.customer?.gstNumber || "",
+                                            validationErrors['invoice.customer.gstNumber']?.message
+                                        )
+                                    }
+                                    {
+                                        getDocumentField(
+                                            'PAN',
+                                            'text',
+                                            handleInvoiceChange,
+                                            invoice.customer?.pan || "",
+                                            validationErrors['invoice.customer.pan']?.message
+                                        )
+                                    }
+
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Billing Address</label>
