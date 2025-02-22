@@ -17,5 +17,6 @@ export const API_ENDPOINTS = {
         DELETE: (id: string) => `/documents/${id}`,
         DOWNLOAD: (id: string) => `/documents/${id}/download`,
         VALIDATE: (id: string) => `/documents/${id}/validate`,
+        UPDATE: (id: string) => `/documents/${id}/update`,
     }
 } as const;

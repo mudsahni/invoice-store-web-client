@@ -45,7 +45,7 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
 
 
     return (
-        <div className="dark:bg-gray-700 bg-white rounded-lg">
+        <div className="rounded-lg bg-yellow-50">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -56,17 +56,17 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
             />
 
             <div className="p-4"> {/* Added consistent padding */}
-                <div className="border dark:border-gray-500 border-blue-100 rounded-lg">
+                <div className="border border-yellow-800 rounded-lg">
                     <div className={` px-2 ${pdfFiles.length > 6 ? 'max-h-96' : ''} overflow-y-auto space-y-4`}>
 
                         <div
-                            className="flex justify-between pr-2 pb-4 px-2 pl-3 pt-4 border-b dark:border-gray-600 border-blue-100 align-middle items-center">
-                            <div className="text-sm dark:text-gray-50 text-blue-900 text-opacity-80">
+                            className="flex justify-between pr-2 pb-4 px-2 pl-3 pt-4 border-b border-yellow-800 border-opacity-20 align-middle items-center">
+                            <div className="text-sm dark:text-gray-50 text-yellow-800 text-opacity-80">
                                 {selectedCount} of {pdfFiles.length} PDF files selected
                             </div>
                             <div className="flex align-middle items-center">
                                 <div
-                                    className="flex dark:bg-gray-700 dark:text-gray-300 dark:border-gray-300 border-blue-800 text-blue-800 border-2 rounded-md justify-center items-center align-middle px-2 py-1 mr-4 cursor-pointer dark:hover:bg-gray-600 hover:bg-blue-50"
+                                    className="flex border-yellow-800 text-yellow-800 border-2 rounded-md justify-center items-center align-middle px-2 py-1 mr-4 cursor-pointer hover:bg-yellow-100"
                                     onClick={handleBrowseClick}
                                 >
                                     <ArrowUturnLeftIcon
@@ -84,17 +84,17 @@ export const SelectedFolder: React.FC<SelectedFolderProps> = ({
                             <div
                                 key={file.id}
                                 onClick={() => toggleFileSelection(file.id)}
-                                className={`flex cursor-pointer items-center px-2 py-3 rounded-lg mb-2 ${file.selected ? 'bg-green-800 bg-opacity-20 border-[1px] dark:border-gray-600 border-green-600' : 'border-opacity-10 dark:border-gray-50 border-blue-800 border-b-[1px] dark:hover:bg-gray-800 hover:bg-blue-50 transition-colors duration-200'}`}
+                                className={`flex cursor-pointer items-center px-2 py-3 rounded-lg mb-2 ${file.selected ? 'bg-green-500 bg-opacity-20 border-[1px] border-green-600' : 'border-opacity-10 border-yellow-800 border-b-[1px] hover:bg-yellow-100 transition-colors duration-200'}`}
                             >
                                 <div className="flex items-center min-w-0 flex-1">
 
                                     <FileText
-                                        className={`h-6 w-6 ${file.selected ? 'text-green-600' : 'dark:text-gray-50 text-blue-900 opacity-60'} mr-2 shrink-0`}/>
+                                        className={`h-6 w-6 ${file.selected ? 'text-green-600' : 'text-yellow-800 opacity-60'} mr-2 shrink-0`}/>
                                     <div className="min-w-0 flex-1 sm:mr-0 mr-4">
-                                        <p className={`${file.selected ? 'text-green-900' : 'text-blue-900 dark:text-gray-50'} text-sm  tracking-wide truncate`}>
+                                        <p className={`${file.selected ? 'text-green-800' : 'text-yellow-800'} text-sm  tracking-wide truncate`}>
                                             {file.webkitRelativePath ? file.webkitRelativePath.split('/').pop() : file.name}
                                         </p>
-                                        <p className={`${file.selected ? 'text-green-900' : 'dark:text-gray-50 text-blue-900'} text-xs  text-opacity-60 truncate`}>
+                                        <p className={`${file.selected ? 'text-green-800' : 'text-yellow-800'} text-xs  text-opacity-60 truncate`}>
                                             {file.webkitRelativePath || file.name}
                                         </p>
                                     </div>

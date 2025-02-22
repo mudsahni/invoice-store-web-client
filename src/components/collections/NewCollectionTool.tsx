@@ -157,7 +157,11 @@ export const NewCollectionTool = () => {
             collectionCreationResponse = await collectionsService.createCollection(
                 collectionName,
                 CollectionType.INVOICE,
-                filesMap
+                filesMap,
+                new Map<string, string>([
+                    ['tenantId', savedTenantJson.id],
+                    ['email', authUser.email]
+                ])
             );
 
             if (collectionCreationResponse === undefined) {

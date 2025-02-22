@@ -1,5 +1,5 @@
 import React from 'react'
-import {CheckIcon} from "lucide-react";
+import {CheckIcon, Combine} from "lucide-react";
 
 export enum StepStatus {
     NOT_STARTED = 'NOT_STARTED',
@@ -18,65 +18,84 @@ interface StepsProps {
     steps: Step[]
 }
 
-export const Steps: React.FC<StepsProps> = ({steps}) => {
+interface BaseStepProps {
+    className?: string;
+    children: React.ReactNode;
+}
 
+
+const BaseStep: React.FC<BaseStepProps> = ({className, children}) => {
+    return (
+        <div
+            className={` ${className || ""} group sm:w-[20rem] w-full rounded-md flex align-middle items-center justify-start space-x-4 p-4 sm:mx-4 transition-transform duration-500 border-2`}>
+            {children}
+        </div>
+    )
+}
+
+const NewActiveStep = ({step}: { step: Step }) => {
+    return (
+        <BaseStep className="bg-yellow-50 border-dashed border-yellow-800">
+            <div
+                className="h-[3rem] w-[3rem] py-2 px-3 rounded-lg bg-yellow-800 text-xl text-white font-medium flex align-middle text-center">
+                <span>{step.id}</span></div>
+            <div className="text-yellow-800 font-semibold">{step.name}</div>
+        </BaseStep>
+    )
+}
+
+const NewCompletedStep = ({step}: { step: Step }) => {
+    return (
+        <BaseStep className="bg-green-50 border-green-800">
+            <div className="py-2 px-3 h-[3rem] w-[3rem] rounded-lg bg-green-600 text-white font-medium"><CheckIcon
+                className="h-8"/>
+            </div>
+            <div className="text-green-800 font-semibold">{step.name}</div>
+        </BaseStep>
+    )
+}
+
+
+const NewToDoStep = ({step}: { step: Step }) => {
+    return (
+        <BaseStep className={"border-dashed border-sky-800 border-opacity-20"}>
+            <div
+                className="h-[3rem] w-[3rem] py-2 px-3 group-hover:bg-indigo-600 text-xl transition-transform duration-500 rounded-lg bg-sky-800 bg-opacity-20 text-white font-medium flex align-middle text-center">
+
+                <span>{step.id}</span>
+            </div>
+            <div className="text-sky-800 text-opacity-20">
+                <div className="font-semibold">{step.name}</div>
+            </div>
+        </BaseStep>
+    )
+}
+
+export const Steps: React.FC<StepsProps> = ({steps}) => {
     return (
         <nav aria-label="Progress">
             <ol role="list"
-                className="dark:bg-gray-200 bg-blue-50 divide-y dark:divide-gray-800 divide-blue-400 rounded-md border dark:border-gray-200 border-blue-400 md:flex md:divide-y-0 mb-8">
+                className="mb-8 grid grid-cols-1 xl:grid-cols-4 gap-4 place-items-center relative">
                 {
                     steps.map((step, stepIdx) =>
-                            <li key={step.name} className="relative md:flex md:flex-1">
-                                {step.status === StepStatus.COMPLETED ? (
-                                    <div className="  group flex w-full items-center">
-                <span className="flex items-center px-6 py-4 text-sm font-medium">
-                  <span
-                      className="flex size-10 shrink-0 items-center justify-center rounded-full bg-green-800">
-                    <CheckIcon aria-hidden="true" className="size-6 dark:text-gray-200 text-blue-50"/>
-                  </span>
-                  <span className="ml-4 text-sm font-medium dark:text-gray-800 text-blue-800">{step.name}</span>
-                </span>
-                                    </div>
-                                ) : step.status === StepStatus.IN_PROGRESS ? (
-                                    <div aria-current="step"
-                                         className="flex items-center px-6 py-4 text-sm font-medium">
-                <span
-                    className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-600 border-2 border-blue-600">
-                  <span className="dark:text-gray-200 text-blue-50">{step.id}</span>
-                </span>
-                                        <span
-                                            className="ml-4 text-sm font-medium dark:text-gray-800 text-blue-800">{step.name}</span>
-                                    </div>
-                                ) : (
-                                    <div className="group flex items-center">
-                <span className="flex items-center px-6 py-4 text-sm font-medium">
-                  <span
-                      className="flex size-10 shrink-0 items-center justify-center rounded-full border-2 dark:border-gray-800 border-blue-800">
-                    <span className="dark:text-gray-800 text-blue-800">{step.id}</span>
-                  </span>
-                  <span className="ml-4 text-sm font-medium text-blue-800 dark:text-gray-800">{step.name}</span>
-                </span>
-                                    </div>
-                                )}
+                        <li key={step.name} className="relative w-full flex justify-center">
+                            {step.status === StepStatus.COMPLETED ? (
+                                <NewCompletedStep step={step}/>
+                            ) : step.status === StepStatus.IN_PROGRESS ? (
+                                <NewActiveStep step={step}/>
+                            ) : (
+                                <NewToDoStep step={step}/>
+                            )}
 
-                                {stepIdx !== steps.length - 1 ? (
-                                    <>
-                                        {/* Arrow separator for lg screens and up */}
-                                        <div aria-hidden="true"
-                                             className="absolute right-0 top-0 hidden h-full w-5 md:block">
-                                            <svg fill="none" viewBox="0 0 22 80" preserveAspectRatio="none"
-                                                 className="size-full dark:text-gray-800 dark:text-opacity-100 text-blue-900 text-opacity-20">
-                                                <path
-                                                    d="M0 -2L20 40L0 82"
-                                                    stroke="currentcolor"
-                                                    vectorEffect="non-scaling-stroke"
-                                                    strokeLinejoin="round"
-                                                />
-                                            </svg>
-                                        </div>
-                                    </>
-                                ) : null}
-                            </li>
+                            {stepIdx !== steps.length - 1 ? (
+                                <>
+                                    {/* Line separator */}
+                                    <div aria-hidden="true"
+                                         className="hidden xl:block absolute top-1/2 -translate-y-1/2 left-[calc(100%-1.2rem)] w-16 h-px bg-green-800 z-1">
+                                    </div>
+                                </>
+                            ) : null}
+                        </li>
                     )
                 }
             </ol>

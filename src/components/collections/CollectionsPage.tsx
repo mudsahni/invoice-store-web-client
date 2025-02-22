@@ -15,6 +15,7 @@ import {YourCollectionsTable} from "@/components/collections/YourCollectionsTabl
 import {CreateNewCollection} from "@/components/collections/CreateNewCollection";
 import {CacheManager} from "@/services/cacheManager";
 import Content from "@/components/ui/Content";
+import PageHeader from "@/components/ui/PageHeader";
 
 
 export interface CollectionsPageProps {
@@ -95,20 +96,21 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
     const CollectionsPageHeader: React.FC = () => {
         return (
             <div className="bg-transparent rounded-xl my-8">
-                <div className="flex px-0 align-middle items-center justify-between">
-                <span
-                    className="sm:text-8xl text-6xl dark:text-gray-200 text-gray-800 font-bold">Collections</span>
+                <div className="flex align-middle items-center justify-between">
+                    <PageHeader title="Collections"/>
                     <button
+                        title="Create Collection"
                         onClick={() => setCreateNewCollection(true)}
-                        className={`${createNewCollection ? 'bg-blue-600 bg-opacity-45 pointer-events-none' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'} sm:p-4 p-3 rounded-lg mt-4 group`}>
-                        <div className="flex items-center">
-                            <FolderPlusIcon className="sm:h-6 h-6 text-white"/>
+                        className={`${createNewCollection ? 'bg-gray-200 pointer-events-none border-2 border-gray-400 text-gray-400' : 'bg-sky-100 border-2 border-sky-800 hover:bg-sky-200 cursor-pointer text-sky-800'} sm:p-4 p-3 rounded-lg group`}>
+                        <div className="flex items-center font-semibold">
+                            <FolderPlusIcon className="sm:h-6 h-6"/>
                             <span
-                                className="lg:block hidden text-white font-semibold ml-4">
+                                className="lg:block hidden ml-4">
                             Create Collection
                         </span>
                         </div>
                     </button>
+
                 </div>
                 <p className="py-4 dark:text-gray-400 text-gray-600 text-base text-justify font-medium">
                     A collection is a set of documents grouped together because of the being uploaded together and/or

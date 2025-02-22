@@ -57,7 +57,7 @@ export const OptionsMenu: React.FC<OptionsMenuProps> = ({menuItems, menuName}) =
     return <Menu as="div" className="relative inline-block text-left">
         <div>
             <MenuButton
-                className="menu-button flex items-center rounded-full bg-sky-50 hover:bg-sky-100 p-1 text-sky-400 hover:text-sky-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-indigo-100">
+                className="menu-button flex items-center rounded-full bg-gray-100 hover:bg-gray-200 p-1 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-blue-200">
                 <WaveEllipsisButton name={menuName}/>
             </MenuButton>
         </div>

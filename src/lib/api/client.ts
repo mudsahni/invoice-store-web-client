@@ -1,7 +1,5 @@
-import { auth } from '@/lib/firebase';
+import {auth} from '@/lib/firebase';
 import {Tenant} from "@/types/auth";
-import {API_ENDPOINTS} from "@/lib/api/endpoints";
-import {CollectionStatusEvent} from "@/types/collections";
 
 interface ApiClientOptions {
     baseUrlPrefix: string;

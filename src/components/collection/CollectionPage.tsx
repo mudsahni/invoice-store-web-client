@@ -14,6 +14,7 @@ import {LoadingSpinner} from "@/components/LoadingSpinner";
 import {Breadcrumbs} from "@/components/ui/breadcrumbs";
 import {CacheManager} from "@/services/cacheManager";
 import Content from "@/components/ui/Content";
+import PageHeader from "@/components/ui/PageHeader";
 
 
 interface CollectionPageProps {
@@ -101,15 +102,17 @@ const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
 
     if (isLoading) {
         return <div
-            className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <LoadingSpinner size={13}/>
+            className="absolute inset-0 flex items-center justify-center bg-gray-200 bg-opacity-100 z-50">
+            <LoadingSpinner size={12} className={"text-gray-500"}/>
         </div>;
     }
 
     return (
         <Content className="space-y-8">
             <Breadcrumbs/>
-
+            <div className="">
+                <PageHeader title="Collection"/>
+            </div>
             {collection &&
                 <>
                     <CollectionMetadata collection={collection}/>

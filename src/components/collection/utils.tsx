@@ -70,6 +70,20 @@ interface BadgeProps {
     size: 'large' | 'medium' | 'small';
 }
 
+interface StatusBadge {
+    status: string;
+}
+
+export const StatusBadge: React.FC<StatusBadge> = ({status}) => {
+    return (
+        <div
+            className={`max-w-24 sm:max-w-32 flex items-center badge badge-warning bg-yellow-100 border-[1px] border-yellow-800 sm:p-2 p-1 sm:rounded-lg rounded-md sm:mt-0 sm:ml-2`}
+        >
+            <CheckCircleIcon className={`h-4 text-yellow-800 mr-2`}/>
+            <span className="truncate text-yellow-800 text-xs font-semibold">{status}</span>
+        </div>
+    )
+}
 export const SuccessBadge: React.FC<BadgeProps> = ({size}) => {
     return (
         <div
@@ -87,7 +101,7 @@ export const InProgressBadge: React.FC<BadgeProps> = ({size}) => {
         <div
             className={`max-w-24 sm:max-w-32 flex items-center badge badge-warning bg-indigo-100 border-[1px] border-indigo-600 sm:p-2 p-1 sm:rounded-lg rounded-md sm:mt-0 sm:ml-2`}>
             <div role="status">
-                <LoadingSpinner size={4}/>
+                <LoadingSpinner size={4} className="mr-2 text-indigo-600"/>
                 <span className="sr-only">Loading...</span>
             </div>
             <span

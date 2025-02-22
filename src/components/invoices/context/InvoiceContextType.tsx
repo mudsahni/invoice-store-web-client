@@ -1,0 +1,15 @@
+import {Invoice} from "@/types/invoice";
+import React from "react";
+
+
+export interface InvoiceContextType {
+    edit: boolean;
+    setEdit: (value: React.SetStateAction<boolean>) => void
+    invoice: Invoice;
+    setInvoice: (value: React.SetStateAction<Invoice>) => void;
+    editableInvoice: Invoice;
+    setEditableInvoice: (value: React.SetStateAction<Invoice>) => void;
+    validationErrors?: { [key: string]: { field: string, message: string } };
+    setValidationErrors: (value: React.SetStateAction<{ [key: string]: { field: string, message: string } }>) => void;
+    handleInvoiceChange: (path: string, value: string) => void;
+}

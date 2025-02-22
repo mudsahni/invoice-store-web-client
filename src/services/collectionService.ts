@@ -1,5 +1,5 @@
-import { apiClient } from '@/lib/api';
-import { API_ENDPOINTS } from '@/lib/api/endpoints';
+import {apiClient} from '@/lib/api';
+import {API_ENDPOINTS} from '@/lib/api/endpoints';
 import {
     NewCollectionRequest,
     CreateCollectionResponse,
@@ -23,12 +23,14 @@ export class CollectionsService {
     async createCollection(
         name: string,
         type: CollectionType,
-        files: Record<string, string>
+        files: Record<string, string>,
+        tags: Map<string, string>
     ): Promise<CreateCollectionResponse> {
         const request: NewCollectionRequest = {
             name,
             type,
             files,
+            tags
         };
 
         const response = await apiClient.post<CreateCollectionResponse>(

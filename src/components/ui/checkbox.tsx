@@ -29,7 +29,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
                 name={`file-${id}`}
                 type="checkbox"
                 aria-describedby="file-selection"
-                className={`${!selected && 'dark:group-hover:bg-gray-50 group-hover:bg-blue-900 group-hover:bg-opacity-20'} col-start-1 cursor-pointer row-start-1 appearance-none rounded dark:bg-gray-50 bg-blue-50 bg-opacity-[1%] border-[1px] dark:border-gray-50 border-blue-900 border-opacity-40 checked:border-green-700 checked:bg-green-700 dark:indeterminate:border-gray-50 dark:indeterminate:bg-gray-50 indeterminate:border-blue-700 indeterminate:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-50 disabled:border-gray-50 disabled:bg-gray-600 disabled:checked:bg-gray-600 forced-colors:appearance-auto`}
+                className={`${!selected && 'group-hover:bg-yellow-800 group-hover:bg-opacity-10'} col-start-1 cursor-pointer row-start-1 appearance-none rounded bg-yellow-50 bg-opacity-[1%] border-[1px] border-yellow-800 border-opacity-40 checked:border-green-700 checked:bg-green-700 dark:indeterminate:border-gray-50 dark:indeterminate:bg-gray-50 indeterminate:border-yellow-700 indeterminate:bg-yellow-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-50 disabled:border-gray-50 disabled:bg-gray-600 disabled:checked:bg-gray-600 forced-colors:appearance-auto`}
 
             />
             <svg

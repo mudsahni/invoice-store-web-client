@@ -1,6 +1,6 @@
 import React from 'react';
-import {InvoicePage} from "@/components/invoices/InvoicePage";
 import ProtectedRoute from "@/contexts/ProtectedRoute";
+import {DocumentPage} from "@/components/document/DocumentPage";
 
 export default async function Page(
     props: {
@@ -11,7 +11,7 @@ export default async function Page(
 
     return (
         <ProtectedRoute>
-            <InvoicePage invoiceId={params.documentId}/>
+            <DocumentPage documentId={params.documentId}/>
         </ProtectedRoute>
     )
 }

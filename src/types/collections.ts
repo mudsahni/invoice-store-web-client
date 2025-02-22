@@ -65,6 +65,7 @@ export interface NewCollectionRequest {
     files: Record<string, string>;
     name: string;
     type: CollectionType;
+    tags: Map<string, string>;
 }
 
 export interface CollectionStatusEvent {
@@ -132,9 +133,9 @@ export interface CollectionDocument {
     private: boolean;
     error: DocumentError;
     permissions: Map<string, PermissionType>;
-    createdAt: { seconds: number; nanos: number };
+    createdAt: number;
     createdBy: string;
-    updatedAt?: { seconds: number; nanos: number };
+    updatedAt?: number;
     updatedBy?: string;
     tags: Map<string, string>;
 

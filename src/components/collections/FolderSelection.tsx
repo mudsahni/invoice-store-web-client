@@ -24,7 +24,7 @@ export const FolderSelection: React.FC<FolderSelectionProps> = ({
     };
 
     return (
-        <div className="space-y-1 dark:bg-gray-700 bg-white  rounded-xl p-2">
+        <div className="space-y-1 bg-yellow-50 rounded-xl p-2">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -36,14 +36,15 @@ export const FolderSelection: React.FC<FolderSelectionProps> = ({
 
 
             <div
-                className="group flex min-h-[300px] dark:bg-gray-700 bg-white flex-col items-center justify-center border-2 border-dashed dark:border-gray-50 border-blue-900 border-opacity-40 rounded-lg p-6 cursor-pointer hover:border-opacity-80 transition-colors"
+                className="group flex min-h-[300px] flex-col items-center justify-center border-2 border-dashed border-yellow-800 border-opacity-40 rounded-lg p-6 cursor-pointer hover:border-opacity-80 transition-colors"
                 onClick={handleBrowseClick}
             >
                 <FolderOpen
-                    className="h-12 w-12 dark:text-gray-200 text-blue-900 text-opacity-80 mb-3 group-hover:text-opacity-100 transition-transform"/>
+                    className="h-12 w-12 text-yellow-800 text-opacity-80 mb-3 group-hover:text-opacity-100 transition-transform"/>
                 <div className="text-center">
-                    <p className="text-sm dark:text-gray-200 text-blue-900">Click to select a folder</p>
-                    <p className="text-xs dark:text-gray-200 text-blue-900 text-opacity-80 mt-1">Only PDF files will be
+                    <p className="text-sm text-yellow-800">Click to select a folder</p>
+                    <p className="text-xs text-yellow-700 text-opacity-80 mt-1">Only PDF files will
+                        be
                         processed</p>
                 </div>
             </div>

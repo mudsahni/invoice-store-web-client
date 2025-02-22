@@ -1,4 +1,4 @@
-import {CollectionDocument, DownloadDocumentResponse} from "@/types/collections";
+import {CollectionDocument, DownloadDocumentResponse, StructuredData} from "@/types/collections";
 import {apiClient} from "@/lib/api";
 import {API_ENDPOINTS} from "@/lib/api/endpoints";
 
@@ -29,6 +29,18 @@ export class DocumentsService {
 
         return await apiClient.get<{ [key: string]: { field: string, message: string } }>(
             API_ENDPOINTS.DOCUMENTS.VALIDATE(id)
+        );
+
+    }
+
+    async updateDocument(
+        id: string,
+        data: StructuredData
+    ): Promise<CollectionDocument> {
+
+        return await apiClient.put<CollectionDocument>(
+            API_ENDPOINTS.DOCUMENTS.UPDATE(id),
+            {data: data}
         );
 
     }
