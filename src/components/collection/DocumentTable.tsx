@@ -11,10 +11,13 @@ import {StyleProps} from "react-json-view-lite/dist/DataRenderer";
 import {getOptionsMenu} from "@/components/collection/utils";
 import {documentService} from "@/services/documentService";
 import {CacheManager} from "@/services/cacheManager";
-import {ChevronLeftIcon} from "lucide-react";
+import {ChevronLeftIcon, FileIcon, SheetIcon} from "lucide-react";
 import TablePagination from "@/components/ui/Pagination";
+import {collectionsService} from "@/services/collectionService";
+import {LoadingSpinner} from "@/components/LoadingSpinner";
 
 export interface DocumentTableProps {
+    collectionId: string;
     documents: Record<string, CollectionDocument>
 }
 
@@ -38,10 +41,11 @@ const documentDownloadLinkCache = new CacheManager<string>({
     ttl: 50 * 60 * 1000, // 50 minutes
 })
 
-export const DocumentTable: React.FC<DocumentTableProps> = ({documents}) => {
+export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, documents}) => {
     const [openRow, setOpenRow] = React.useState<string | null>(null);
     const [documentDownloadLinks, setDocumentDownloadLinks] = React.useState<Record<string, string>>({});
     const [optionsMenuItems, setOptionsMenuItems] = React.useState<Record<string, ReturnType<typeof getOptionsMenu>>>({});
+    const [exporting, setExporting] = React.useState<boolean>(false);
 
     const toggleRow = (key: string) => {
         setOpenRow(openRow === key ? null : key);
@@ -110,10 +114,44 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({documents}) => {
         setOptionsMenuItems(loadedOptionsMenuItems);
     }, [documentDownloadLinks, documents])
 
+    const exportCSV = async () => {
+        try {
+            setExporting(true)
+            const blob = await collectionsService.exportCollection(collectionId);
+
+            // Create download link
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `collection_${collectionId}.csv`;  // or any filename you want
+            document.body.appendChild(a);
+            a.click();
+
+            // Cleanup
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Export failed:', error);
+            // Handle error (show notification, etc.)
+        } finally {
+            setExporting(false);
+        }
+    }
     return (
 
         <div className="bg-gray-50 rounded-xl p-8">
-            <span className="text-gray-700 font-bold sm:text-4xl text-3xl">Documents</span>
+            <div className="flex justify-between align-middle items-center">
+                <span className="text-gray-700 font-bold sm:text-4xl text-3xl">Documents</span>
+                <button
+                    disabled={exporting}
+                    className={`${exporting ? 'bg-gray-100 border-gray-400 text-gray-400' : 'bg-sky-100 border-sky-800 text-sky-800'} flex align-middle space-x-2 items-center py-1 px-2  rounded-md border font-semibold text-sm`}
+                    onClick={exportCSV}>
+                    {
+                        exporting ? <LoadingSpinner size={4} className={"mr-2"}/> : <SheetIcon className="h-4"/>
+                    }
+                    Export
+                </button>
+            </div>
             <div className="mt-8 flow-root">
                 <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
                     <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">

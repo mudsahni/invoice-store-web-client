@@ -272,5 +272,24 @@ export class ApiClient {
             controller.abort();
         };
     }
+
+    async getBlob(endpoint: string): Promise<Blob> {
+        const url = new URL(`${this.getBaseUrl()}${endpoint}`);
+
+        const response = await this.fetchWithTimeout(url.toString(), {
+            method: 'GET',
+            headers: {
+                ...await this.getHeaders(),
+                'Accept': 'text/csv'  // Request CSV
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return response.blob();  // Return as blob directly
+    }
+
 }
 

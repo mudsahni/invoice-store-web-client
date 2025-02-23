@@ -6,6 +6,7 @@ export const API_ENDPOINTS = {
         LIST: '/collections',
         DELETE: (id: string) => `/collections/${id}`,
         STREAM: (id: string) => `/collections/${id}/sse`,
+        EXPORT: (id: string) => `/collections/${id}/export`,
     },
     USERS: {
         GET: (id: string) => `/users/${id}`,

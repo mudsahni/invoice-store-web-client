@@ -117,7 +117,7 @@ const CollectionPage: React.FC<CollectionPageProps> = ({id}) => {
                 <>
                     <CollectionMetadata collection={collection}/>
 
-                    <DocumentTable documents={collection.documents}/>
+                    <DocumentTable collectionId={collection.id} documents={collection.documents}/>
                 </>
             }
         </Content>

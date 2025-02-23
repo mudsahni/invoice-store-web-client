@@ -80,6 +80,14 @@ export class CollectionsService {
         return collection
 
     }
+
+    async exportCollection(
+        id: string
+    ): Promise<Blob> {
+        return await apiClient.getBlob(
+            API_ENDPOINTS.COLLECTIONS.EXPORT(id)
+        );
+    }
 }
 
 export const collectionsService = new CollectionsService();
