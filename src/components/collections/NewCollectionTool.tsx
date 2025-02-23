@@ -151,7 +151,7 @@ export const NewCollectionTool = () => {
 
             const filesMap: Record<string, string> = {};
             for (const pdfFile of selectedFiles) {
-                filesMap[pdfFile.file.name] = "application/pdf"
+                filesMap[pdfFile.file.name] = pdfFile.file.type
             }
 
             collectionCreationResponse = await collectionsService.createCollection(
@@ -260,12 +260,33 @@ export const NewCollectionTool = () => {
         };
     };
 
+    // Define supported file types
+    const SUPPORTED_FILE_TYPES: { [key: string]: string[] } = {
+        'application/pdf': ['pdf'],
+        'image/jpeg': ['jpg', 'jpeg'],
+        'image/png': ['png'],
+        'image/tiff': ['tif', 'tiff']
+    };
+    // Helper function to check if file is supported
+    const isFileSupported = (file: File): boolean => {
+        // Check MIME type first
+        if (SUPPORTED_FILE_TYPES[file.type]) {
+            return true;
+        }
+
+        // Fallback to extension check
+        const extension = file.name.split('.').pop()?.toLowerCase();
+        return Object.values(SUPPORTED_FILE_TYPES).flat().includes(extension || '');
+    };
+
+
     const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
         console.log('Raw files from input:', files);
 
         const pdfFiles = files
-            .filter(file => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))
+            .filter(isFileSupported)
+            // .filter(file => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))
             .map(file => {
                 // Keep the original File object in a property
                 return {
@@ -277,7 +298,8 @@ export const NewCollectionTool = () => {
                     size: file.size,
                     lastModified: file.lastModified,
                     // Store the actual File object
-                    file: file
+                    file: file,
+                    fileType: file.type.includes('pdf') ? 'pdf' : 'image'
                 };
             });
 
@@ -292,7 +314,7 @@ export const NewCollectionTool = () => {
             setError('No folder selected.');
             setShowError(true)
         } else if (pdfFiles.length === 0) {
-            setError('No PDF files found in the selected folder.');
+            setError('No supported files found in the selected folder. Please upload PDFs or images (JPEG, PNG, TIFF).');
             setShowError(true)
         }
     };

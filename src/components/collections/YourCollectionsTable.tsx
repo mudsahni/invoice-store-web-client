@@ -1,6 +1,5 @@
 import React from 'react'
 import {ArrowPathIcon, ChevronRightIcon} from "@heroicons/react/20/solid";
-import {ChevronLeftIcon} from "lucide-react";
 import {LoadingSpinner} from "@/components/LoadingSpinner";
 import {getStatusStyles} from "@/components/collections/utils";
 import {FaceFrownIcon} from "@heroicons/react/24/outline";

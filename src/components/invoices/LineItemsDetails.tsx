@@ -187,7 +187,7 @@ export const LineItemsDetails: React.FC<LineItemsDetailsProps> = () => {
                                 }
                             </div>
                             {invoice.lineItems && invoice.lineItems[index]?.taxes && invoice.lineItems[index]?.taxes?.map((tax, taxIndex) => (
-                                <div>
+                                <div key={taxIndex}>
                                     <div
                                         className="flex items-center align-middle justify-between mt-4">
                                         <h4 className="text-sm text-gray-700 mb-2">{`Tax ${taxIndex + 1}`}</h4>

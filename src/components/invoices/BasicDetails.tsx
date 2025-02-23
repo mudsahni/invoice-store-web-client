@@ -61,6 +61,15 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     value={invoice.placeOfSupply || ''}
                     error={errors['invoice.placeOfSupply']?.message}
                 />
+                <DocumentField
+                    label="IRN Number"
+                    type="text"
+                    path="irnNumber"
+                    handleOnChange={handleInvoiceChange}
+                    disabled={!edit}
+                    value={invoice.irnNumber || ''}
+                    error={errors['invoice.irnNumber']?.message}
+                />
             </div>
         </div>
     )

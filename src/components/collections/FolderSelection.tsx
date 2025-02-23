@@ -31,6 +31,7 @@ export const FolderSelection: React.FC<FolderSelectionProps> = ({
                 onChange={handleFolderSelect}
                 className="hidden"
                 webkitdirectory=""
+                accept=".pdf,.jpg,.jpeg,.png,.tif,.tiff,application/pdf,image/jpeg,image/png,image/tiff"
                 multiple
             />
             <div

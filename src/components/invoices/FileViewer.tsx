@@ -1,17 +1,38 @@
 import React, {useState} from 'react'
 import {openDB} from "idb";
+import {LoadingSpinner} from "@/components/LoadingSpinner";
 
 interface FileViewerProps {
     name: string;
     loading: boolean;
     downloadLink: string;
+    fileType: string; // 'pdf' | 'image'
 }
 
 const DB_NAME = 'files-db';
-const STORE_NAME = 'pdfs';
+const STORE_NAME = 'files';
+
+const MIME_TYPES = {
+    pdf: 'application/pdf',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    tiff: 'image/tiff',
+    tif: 'image/tiff'
+};
+
+const getFileType = (filename: string): string => {
+    const extension = filename.split('.').pop()?.toLowerCase() || '';
+    for (const [type, mimeType] of Object.entries(MIME_TYPES)) {
+        if (extension === type) {
+            return mimeType;
+        }
+    }
+    return 'application/pdf'; // default to PDF
+};
 
 
-export const FileViewer: React.FC<FileViewerProps> = ({name, loading, downloadLink}) => {
+export const FileViewer: React.FC<FileViewerProps> = ({name, loading, downloadLink, fileType}) => {
     const [cachedUrl, setCachedUrl] = useState<string>('');
     const [error, setError] = useState<string>('');
 
@@ -27,40 +48,40 @@ export const FileViewer: React.FC<FileViewerProps> = ({name, loading, downloadLi
                 });
 
                 // Try to get the file from IndexedDB first
-                const storedPdf = await db.get(STORE_NAME, name);
+                const storedFile = await db.get(STORE_NAME, name);
 
-                if (storedPdf) {
-                    console.log('PDF found in IndexedDB');
-                    const blob = new Blob([storedPdf], {
-                        type: 'application/pdf'
-                    });
+                if (storedFile) {
+                    console.log('File found in IndexedDB');
+                    const mimeType = getFileType(name);
+                    const blob = new Blob([storedFile], {type: mimeType});
                     const url = URL.createObjectURL(blob);
                     setCachedUrl(url);
                 } else {
-                    console.log('Downloading PDF...');
+                    console.log('Downloading file...');
                     const response = await fetch(downloadLink);
 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
-                    const pdfBlob = await response.blob();
+                    const fileBlob = await response.blob();
+                    const expectedMimeType = getFileType(name);
 
-                    // Verify we got a PDF
-                    if (pdfBlob.type !== 'application/pdf') {
-                        console.warn('Response is not a PDF:', pdfBlob.type);
+                    // Verify file type
+                    if (!fileBlob.type.includes(expectedMimeType)) {
+                        console.warn('Unexpected file type:', fileBlob.type);
                     }
 
                     // Store in IndexedDB
-                    const arrayBuffer = await pdfBlob.arrayBuffer();
+                    const arrayBuffer = await fileBlob.arrayBuffer();
                     await db.put(STORE_NAME, arrayBuffer, name);
 
-                    const url = URL.createObjectURL(pdfBlob);
+                    const url = URL.createObjectURL(fileBlob);
                     setCachedUrl(url);
                 }
             } catch (error) {
-                console.error('Error handling PDF:', error);
-                setError('Failed to load PDF');
+                console.error('Error handling file:', error);
+                setError('Failed to load file');
                 // Fallback to direct link
                 setCachedUrl(downloadLink);
             }
@@ -81,15 +102,28 @@ export const FileViewer: React.FC<FileViewerProps> = ({name, loading, downloadLi
         return <div className="text-red-500">{error}</div>;
     }
 
+    if (loading) {
+        return <div><LoadingSpinner size={5}/></div>;
+    }
+
+
+    // Render different components based on file type
+    if (fileType.includes("image")) {
+        return (
+            <img
+                src={cachedUrl || 'about:blank'}
+                alt={name}
+                className="w-full rounded-xl object-contain max-h-screen"
+            />
+        );
+    }
+
+
     return (
-        <>
-            {
-                loading ? <div>Loading...</div> : <iframe
-                    src={cachedUrl || 'about:blank'}
-                    className="w-full h-screen rounded-xl max-h-[100%]"
-                    title="PDF Viewer"
-                />
-            }
-        </>
-    )
+        <iframe
+            src={cachedUrl || 'about:blank'}
+            className="w-full h-screen rounded-xl max-h-[100%]"
+            title="File Viewer"
+        />
+    );
 }

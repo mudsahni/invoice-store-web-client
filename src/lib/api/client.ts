@@ -241,7 +241,7 @@ export class ApiClient {
                     }
                 };
 
-                (async () => {
+                await (async () => {
                     try {
                         while (true) {
                             const {done, value} = await reader.read();

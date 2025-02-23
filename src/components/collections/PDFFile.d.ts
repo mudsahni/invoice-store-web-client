@@ -7,6 +7,7 @@ export interface PDFFile {
     size: number;
     lastModified: number;
     file: File;  // Store the actual File object
+    fileType: string;
 }
 
 export interface ProcessedData {

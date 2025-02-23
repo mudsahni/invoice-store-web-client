@@ -253,7 +253,8 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
                         {
                             showRaw ?
                                 <RawContentViewer loading={loading} content={document?.data.raw || ""}/> :
-                                <FileViewer name={document.id} loading={loading} downloadLink={downloadLink || ""}/>
+                                <FileViewer name={document.id} loading={loading} downloadLink={downloadLink || ""}
+                                            fileType={document.path}/>
                         }
 
                     </div>

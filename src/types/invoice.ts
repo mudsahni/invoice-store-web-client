@@ -7,6 +7,7 @@ export interface Invoice {
     billingDate?: string;
     dueDate?: string;
     placeOfSupply?: string;
+    irnNumber?: string;
     currencyCode?: string;
     customer?: Customer;
     vendor?: Vendor;
