@@ -24,7 +24,7 @@ export const FolderSelection: React.FC<FolderSelectionProps> = ({
     };
 
     return (
-        <div className="space-y-1 bg-yellow-50 rounded-xl p-2">
+        <div className="rounded-lg p-2 bg-sky-100">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -33,23 +33,25 @@ export const FolderSelection: React.FC<FolderSelectionProps> = ({
                 webkitdirectory=""
                 multiple
             />
-
-
             <div
-                className="group flex min-h-[300px] flex-col items-center justify-center border-2 border-dashed border-yellow-800 border-opacity-40 rounded-lg p-6 cursor-pointer hover:border-opacity-80 transition-colors"
-                onClick={handleBrowseClick}
+                onClick={() => fileInputRef.current?.click()}
+                className="group relative cursor-pointer rounded-lg bg-sky-50 border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
             >
-                <FolderOpen
-                    className="h-12 w-12 text-yellow-800 text-opacity-80 mb-3 group-hover:text-opacity-100 transition-transform"/>
-                <div className="text-center">
-                    <p className="text-sm text-yellow-800">Click to select a folder</p>
-                    <p className="text-xs text-yellow-700 text-opacity-80 mt-1">Only PDF files will
-                        be
-                        processed</p>
+                <div className="mx-auto flex flex-col items-center">
+                    <FolderOpen
+                        className="h-12 w-12 text-gray-400 group-hover:text-sky-600 transition-colors duration-300"/>
+                    <div className="mt-4">
+                        <h3 className="text-sm font-medium text-gray-900">
+                            Click to select a folder
+                        </h3>
+                        <p className="mt-1 text-xs text-gray-500">
+                            Only PDF files will be processed
+                        </p>
+                    </div>
                 </div>
+                <div
+                    className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-50/5 to-gray-50/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
             </div>
-
-
         </div>
     )
 }
