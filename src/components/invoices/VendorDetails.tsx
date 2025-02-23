@@ -126,48 +126,48 @@ export const VendorDetails: React.FC<VendorDetailsProps> = () => {
                                 <DocumentField
                                     label="Bank Name"
                                     type="text"
-                                    path={`vendor.bankDetails.${index}.bankName`}
+                                    path={`vendor.bankDetails[${index}].bankName`}
                                     handleOnChange={handleInvoiceChange}
                                     disabled={!edit}
                                     value={invoice.vendor?.bankDetails?.[index]?.bankName || ""}
-                                    error={errors[`invoice.vendor.bankDetails.${index}.bankName`]?.message}
+                                    error={errors[`invoice.vendor.bankDetails[${index}].bankName`]?.message}
                                 />
                                 <DocumentField
                                     label="Account Number"
                                     type="text"
-                                    path={`vendor.bankDetails.${index}.accountNumber`}
+                                    path={`vendor.bankDetails[${index}].accountNumber`}
                                     handleOnChange={handleInvoiceChange}
                                     disabled={!edit}
                                     value={invoice.vendor?.bankDetails?.[index]?.accountNumber || ""}
-                                    error={errors[`invoice.vendor.bankDetails.${index}.accountNumber`]?.message}
+                                    error={errors[`invoice.vendor.bankDetails[${index}].accountNumber`]?.message}
                                 />
                                 <DocumentField
                                     label="IFSC"
                                     type="text"
-                                    path={`vendor.bankDetails.${index}.ifsc`}
+                                    path={`vendor.bankDetails[${index}].ifsc`}
                                     handleOnChange={handleInvoiceChange}
                                     disabled={!edit}
                                     value={invoice.vendor?.bankDetails?.[index]?.ifsc || ""}
-                                    error={errors[`invoice.vendor.bankDetails.${index}.ifsc`]?.message}
+                                    error={errors[`invoice.vendor.bankDetails[${index}].ifsc`]?.message}
                                 />
                                 <DocumentField
                                     label="Branch"
                                     type="text"
-                                    path={`vendor.bankDetails.${index}.branch`}
+                                    path={`vendor.bankDetails[${index}].branch`}
                                     handleOnChange={handleInvoiceChange}
                                     disabled={!edit}
                                     value={invoice.vendor?.bankDetails?.[index]?.branch || ""}
-                                    error={errors[`invoice.vendor.bankDetails.${index}.branch`]?.message}
+                                    error={errors[`invoice.vendor.bankDetails[${index}].branch`]?.message}
                                 />
                             </div>
                             <DocumentField
                                 label="Branch Address"
                                 type="textarea"
-                                path={`vendor.bankDetails.${index}.branchAddress`}
+                                path={`vendor.bankDetails[${index}].branchAddress`}
                                 handleOnChange={handleInvoiceChange}
                                 disabled={!edit}
                                 value={invoice.vendor?.bankDetails?.[index]?.branchAddress || ""}
-                                error={errors[`invoice.vendor.bankDetails.${index}.branchAddress`]?.message}
+                                error={errors[`invoice.vendor.bankDetails[${index}].branchAddress`]?.message}
                             />
                         </div>
                     ))}
