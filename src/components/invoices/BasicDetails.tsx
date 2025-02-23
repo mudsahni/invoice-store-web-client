@@ -40,7 +40,7 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     path="billingDate"
                     handleOnChange={handleInvoiceChange}
                     disabled={!edit}
-                    value={invoice.billingDate ? new Date(invoice.billingDate).toISOString().split('T')[0] : ''}
+                    value={invoice.billingDate}
                     error={errors['invoice.billingDate']?.message}
                 />
                 <DocumentField

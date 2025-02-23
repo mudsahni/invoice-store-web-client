@@ -209,6 +209,7 @@ export const LineItemsDetails: React.FC<LineItemsDetailsProps> = () => {
                                                 className="block text-sm font-medium text-gray-700">Category</label>
                                             <select
                                                 value={tax.category || ""}
+                                                disabled={!edit}
                                                 onChange={(e) => handleInvoiceChange(`lineItems.${index}.taxes.${taxIndex}.category`, e.target.value)}
                                                 aria-placeholder={tax.category || "Select Tax"}
                                                 className="block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-sky-500 focus:outline-none focus:ring-sky-500 sm:text-sm"
@@ -226,6 +227,7 @@ export const LineItemsDetails: React.FC<LineItemsDetailsProps> = () => {
                                                 (%)</label>
                                             <input
                                                 type="number"
+                                                disabled={!edit}
                                                 placeholder="Rate"
                                                 value={tax.rate || ""}
                                                 onChange={(e) => handleInvoiceChange(`lineItems.${index}.taxes.${taxIndex}.rate`, e.target.value)}
@@ -238,6 +240,7 @@ export const LineItemsDetails: React.FC<LineItemsDetailsProps> = () => {
                                                 (%)</label>
                                             <input
                                                 type="number"
+                                                disabled={!edit}
                                                 placeholder="Amount"
                                                 value={tax.amount || ""}
                                                 onChange={(e) => handleInvoiceChange(`lineItems.${index}.taxes.${taxIndex}.amount`, e.target.value)}
