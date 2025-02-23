@@ -67,10 +67,9 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
         setSaving(true);
         console.log("Saving document");
         setInvoice(editableInvoice)
-        handleValidationRefresh()
         const fetchedDocument = await documentService.updateDocument(invoiceId, {
             structured: {invoice: editableInvoice},
-            raw: JSON.stringify(editableInvoice, null, 2),
+            raw: JSON.stringify({'invoice': editableInvoice}, null, 2),
             errors: validationErrors
         })
         setDocument(fetchedDocument);
@@ -160,6 +159,7 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
         getDocument();
 
     }, [invoiceId]);
+
 
     const [document, setDocument] = useState<CollectionDocument | null>(null);
 
@@ -281,22 +281,22 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
                             </>
                         }
                         <div className="flex items-center space-x-4">
-                            {edit && (
-                                <button
-                                    disabled={saving || validating}
-                                    onClick={handleValidationRefresh}
-                                    className="flex items-center px-4 py-2 text-sm font-medium text-indigo-800 bg-indigo-100 border border-indigo-800 rounded-md hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                    {
-                                        validating ? (
-                                            <LoadingSpinner size={4} className="mr-2"/>
-                                        ) : (
-                                            <ArrowPathIcon className="w-4 h-4 mr-2"/>
-                                        )
-                                    }
-                                    Validate
-                                </button>
-                            )}
+                            {/*{edit && (*/}
+                            {/*    <button*/}
+                            {/*        disabled={saving || validating}*/}
+                            {/*        onClick={handleValidationRefresh}*/}
+                            {/*        className="flex items-center px-4 py-2 text-sm font-medium text-indigo-800 bg-indigo-100 border border-indigo-800 rounded-md hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"*/}
+                            {/*    >*/}
+                            {/*        {*/}
+                            {/*            validating ? (*/}
+                            {/*                <LoadingSpinner size={4} className="mr-2"/>*/}
+                            {/*            ) : (*/}
+                            {/*                <ArrowPathIcon className="w-4 h-4 mr-2"/>*/}
+                            {/*            )*/}
+                            {/*        }*/}
+                            {/*        Validate*/}
+                            {/*    </button>*/}
+                            {/*)}*/}
 
                             {edit && (
                                 <button
