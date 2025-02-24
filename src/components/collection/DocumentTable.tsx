@@ -283,13 +283,13 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
                                                         <h3 className="text-gray-800 text-sm font-semibold py-2">Raw
                                                             Output</h3>
                                                         <pre className="bg-white rounded-xl p-4 overflow-auto">
-                        <SafeJsonView
-                            rawData={value?.data?.raw ?? {}}
-                            customJsonViewStyles={{
-                                // Your custom styles
-                            }}
-                        />
-                    </pre>
+                                                            <SafeJsonView
+                                                                rawData={value?.data?.raw ?? {}}
+                                                                customJsonViewStyles={{
+                                                                    // Your custom styles
+                                                                }}
+                                                            />
+                                                        </pre>
                                                     </div>
                                                 </div>
                                             </td>

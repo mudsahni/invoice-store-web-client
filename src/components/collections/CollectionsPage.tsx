@@ -66,14 +66,32 @@ export const CollectionsPage: React.FC<CollectionsPageProps> = () => {
             setLoadCollections(true)
             const cachedData = collectionsCache.get('user_collections'); // or any appropriate ID
             if (cachedData) {
-                setCollections(cachedData.data);
+                // Apply sorting to cached data
+                const sortedCachedData = [...cachedData.data].sort((a, b) => {
+                    // Compare seconds first
+                    if (a.createdAt.seconds !== b.createdAt.seconds) {
+                        return b.createdAt.seconds - a.createdAt.seconds; // Newest first
+                    }
+                    // If seconds are equal, compare nanoseconds
+                    return b.createdAt.nanos - a.createdAt.nanos;
+                });
+
+                setCollections(sortedCachedData);
                 setLoadCollections(false);
                 return;
             }
             // Fetch collections from the server
             // If no cache or expired, fetch from server
             const fetchedCollections = await collectionsService.getCollections();
-            const sortedCollections = fetchedCollections.collections.sort((a, b) => a.createdAt > b.createdAt ? -1 : 1)
+            // Sort Firestore timestamp objects
+            const sortedCollections = [...fetchedCollections.collections].sort((a, b) => {
+                // Compare seconds first
+                if (a.createdAt.seconds !== b.createdAt.seconds) {
+                    return b.createdAt.seconds - a.createdAt.seconds; // Newest first
+                }
+                // If seconds are equal, compare nanoseconds
+                return b.createdAt.nanos - a.createdAt.nanos;
+            });
             // Cache the new data
             collectionsCache.set('user_collections', sortedCollections);
             setCollections(sortedCollections)
