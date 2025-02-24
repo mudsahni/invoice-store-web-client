@@ -7,7 +7,7 @@ import {CollectionStatusComponent} from "@/components/collection/utils";
 interface MetadataItem {
     id: string;
     label: string;
-    value: string | string[] | undefined;
+    value: string | string[] | Map<string, string> | Record<string, string> | undefined;
     editable?: boolean;
     onEdit?: () => void;
 }
@@ -30,13 +30,23 @@ interface MetadataDisplayProps {
 const MetadataBadge: React.FC<{
     label: string | undefined;
     className?: string;
-}> = ({label, className = ""}) => (
-    <span
-        className={`items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20 mr-2 mb-2 ${className}`}
-    >
-    {label}
-  </span>
-);
+}> = ({label, className = ""}) => {
+    // Safety check to ensure label is a string
+    if (label === undefined || label === null) {
+        return null;
+    }
+
+    // Convert objects to strings if needed
+    const displayLabel = typeof label === 'object' ? JSON.stringify(label) : String(label);
+
+    return (
+        <span
+            className={`items-center rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 ring-1 ring-inset ring-yellow-600/20 mr-2 mb-2 ${className}`}
+        >
+            {displayLabel}
+        </span>
+    );
+};
 
 const MetadataSection: React.FC<{
     item: MetadataItem;
@@ -44,7 +54,38 @@ const MetadataSection: React.FC<{
     sectionClassName?: string;
     onEdit?: () => void;
 }> = ({item, badgeClassName, sectionClassName, onEdit}) => {
-    const values = Array.isArray(item.value) ? item.value : [item.value];
+    // Process the value based on its type
+    const renderValues = () => {
+        if (item.value === undefined || item.value === null) {
+            return [];
+        }
+
+        if (item.value instanceof Map) {
+            // Process Map<string, string>
+            const values: string[] = [];
+            item.value.forEach((value, key) => {
+                values.push(`${key}: ${value}`);
+            });
+            return values;
+        } else if (typeof item.value === 'object' && !Array.isArray(item.value)) {
+            // Handle plain objects (Record<string, string>)
+            const values: string[] = [];
+            Object.entries(item.value).forEach(([key, value]) => {
+                values.push(`${key}: ${value}`);
+            });
+            return values;
+        } else if (Array.isArray(item.value)) {
+            // Process string[]
+            return item.value.map(value =>
+                typeof value === 'object' ? JSON.stringify(value) : String(value)
+            );
+        } else {
+            // Process string or any other type by converting to string
+            return [String(item.value)];
+        }
+    };
+
+    const values = renderValues();
 
     return (
         <div className={`mt-8 divider divide-y divide-sky-900 divide-opacity-10 ${sectionClassName}`}>
@@ -107,8 +148,8 @@ export const MetadataHeader: React.FC<MetadataHeaderProps> = ({
                 {status}
             </div>
         </div>
-    )
-}
+    );
+};
 
 export const MetadataDisplay: React.FC<MetadataDisplayProps> = ({
                                                                     type,

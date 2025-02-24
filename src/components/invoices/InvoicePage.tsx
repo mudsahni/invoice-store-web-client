@@ -209,6 +209,12 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
                         label: "Collection",
                         value: document?.collectionId,
                         editable: false
+                    },
+                    {
+                        id: "tags",
+                        label: "Tags",
+                        value: document?.tags,
+                        editable: false
                     }
                 ]}
                 date={document?.updatedAt ? new Date(document.updatedAt).toDateString() : new Date(document?.createdAt * 1000).toDateString()}
