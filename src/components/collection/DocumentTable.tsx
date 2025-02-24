@@ -1,17 +1,14 @@
 import React from 'react'
-import {CollectionDocument} from "@/types/collections";
-import {
-    DocumentTextIcon,
-    ChevronDownIcon, ChevronRightIcon,
-} from '@heroicons/react/20/solid'
+import {CollectionDocument, DocumentStatus} from "@/types/collections";
+import {ChevronDownIcon, DocumentTextIcon,} from '@heroicons/react/20/solid'
 import {OptionsMenu} from "@/components/collection/OptionsMenu";
-import {JsonView, allExpanded, defaultStyles, darkStyles} from "react-json-view-lite";
+import {allExpanded, defaultStyles, JsonView} from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
 import {StyleProps} from "react-json-view-lite/dist/DataRenderer";
 import {getOptionsMenu} from "@/components/collection/utils";
 import {documentService} from "@/services/documentService";
 import {CacheManager} from "@/services/cacheManager";
-import {ChevronLeftIcon, FileIcon, SheetIcon} from "lucide-react";
+import {SheetIcon} from "lucide-react";
 import TablePagination from "@/components/ui/Pagination";
 import {collectionsService} from "@/services/collectionService";
 import {LoadingSpinner} from "@/components/LoadingSpinner";
@@ -20,6 +17,53 @@ export interface DocumentTableProps {
     collectionId: string;
     documents: Record<string, CollectionDocument>
 }
+
+interface SafeJsonViewProps {
+    rawData: any;
+    allExpanded?: boolean;
+    customJsonViewStyles?: Record<string, any>;
+}
+
+interface DocumentData {
+    data: {
+        raw: string | Record<string, any> | null;
+    };
+    // Add other properties your document data has
+}
+
+const SafeJsonView: React.FC<SafeJsonViewProps> = ({
+                                                       rawData,
+                                                       customJsonViewStyles = {}
+                                                   }) => {
+
+    try {
+        // First try to parse if it's a string
+        const parsedData = typeof rawData === 'string'
+            ? JSON.parse(rawData)
+            : rawData;
+
+        return (
+            <JsonView
+                data={parsedData}
+                shouldExpandNode={() => true}
+                style={customJsonViewStyles}
+            />
+        );
+    } catch (error) {
+        // console.error('JSON Parse Error:', error);
+
+        return (
+            <>
+                <div className="text-red-500 mb-2 p-2 bg-red-50 rounded">
+                    Error parsing JSON data
+                </div>
+                <div className="whitespace-pre-wrap font-mono text-sm">
+                    {typeof rawData === 'string' ? rawData : JSON.stringify(rawData, null, 2)}
+                </div>
+            </>
+        );
+    }
+};
 
 const customJsonViewStyles: StyleProps = {
     ...defaultStyles,  // Spread the default styles if you want to keep some
@@ -223,8 +267,11 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
                                                     </span>
                                             </td>
                                             <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-base font-medium sm:pr-0">
-                                                <OptionsMenu menuItems={optionsMenuItems[key]}
-                                                             menuName={value.name}/>
+                                                {
+                                                    value.status === DocumentStatus.VALIDATED &&
+                                                    <OptionsMenu menuItems={optionsMenuItems[key]}
+                                                                 menuName={value.name}/>
+                                                }
                                             </td>
                                         </tr>
                                         {/* Accordion Content Row */}
@@ -235,13 +282,14 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
                                                         {/* Add your expanded content here */}
                                                         <h3 className="text-gray-800 text-sm font-semibold py-2">Raw
                                                             Output</h3>
-                                                        <pre
-                                                            className="bg-white rounded-xl p-4 overflow-auto">
-                                                                {<JsonView data={JSON.parse(value.data.raw || "{}")}
-                                                                           shouldExpandNode={allExpanded}
-                                                                           style={customJsonViewStyles}/>}
-                                                            {/*{JSON.stringify(value.data.raw, null, 2)}*/}
-                                                            </pre>
+                                                        <pre className="bg-white rounded-xl p-4 overflow-auto">
+                        <SafeJsonView
+                            rawData={value?.data?.raw ?? {}}
+                            customJsonViewStyles={{
+                                // Your custom styles
+                            }}
+                        />
+                    </pre>
                                                     </div>
                                                 </div>
                                             </td>
