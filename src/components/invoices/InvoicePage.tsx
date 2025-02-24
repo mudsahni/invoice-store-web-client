@@ -1,7 +1,7 @@
 'use client';
 import React, {useState} from 'react'
 import {ArrowPathIcon, PencilSquareIcon, PlusIcon} from "@heroicons/react/20/solid";
-import {CurlyBracesIcon, FileIcon, SaveIcon, XCircleIcon} from "lucide-react";
+import {CurlyBracesIcon, FileIcon, RabbitIcon, SaveIcon, SmileIcon, XCircleIcon} from "lucide-react";
 import {documentService} from "@/services/documentService";
 import {CacheManager} from "@/services/cacheManager";
 import {CollectionDocument} from "@/types/collections";
@@ -168,7 +168,18 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
     }
 
     if (document === null || document === undefined || document.data.structured?.invoice === undefined) {
-        return <div className="text-center text-gray-800">Document not found</div>
+        return (
+            <div className="flex items-center justify-center h-[80vh]">
+                <div className="bg-gray-50 h-[400px] w-[400px] flex rounded-xl items-center justify-center">
+                    <div className="flex flex-col items-center justify-center text-center">
+                        <RabbitIcon className="h-10 w-10 text-gray-400 mb-4"/>
+                        <span className="text-gray-400 text-xl font-semibold mb-2">Document not found</span>
+                        <a href="/collections" className="text-sky-600 font-medium text-lg">Go back to collections</a>
+                    </div>
+                </div>
+            </div>
+        );
+
     }
 
     return (
