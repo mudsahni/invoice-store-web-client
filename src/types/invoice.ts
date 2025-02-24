@@ -46,6 +46,7 @@ export interface BilledAmount {
     balanceDue?: number;
     amountInWords?: string;
     previousDues?: number;
+    taxes?: Tax[];
 }
 
 export interface LineItem {
