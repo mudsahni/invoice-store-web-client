@@ -18,10 +18,13 @@ interface DocumentFieldProps {
 const parseDate = (dateString: string) => {
     // Array of possible date formats to try
     const dateFormats = [
-        'dd-MM-yyyy',
-        'dd/MM/yyyy',
-        'dd-MMM-yyyy',
-        'yyyy-MM-dd',
+        "dd-MMM-yy",    // 10-Sep-24
+        "dd/MMM/yy",    // 10/Sep/24
+        "dd/MM/yyyy",   // 10/09/2024
+        "yyyy-MM-dd",   // 2024-09-10
+        "dd/MM/yy",     // 10/09/24
+        "dd-MMM-yyyy",   // 10-Sep-2024
+        "dd\\MM\\yyyy"   // 10\09\2024
         // Add more formats as needed
     ];
 
