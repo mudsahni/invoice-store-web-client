@@ -1,40 +1,43 @@
 import React from "react";
-import {FolderSelection} from "@/components/collections/FolderSelection";
-import {SelectedFolder} from "@/components/collections/SelectedFolder";
+import {useRouter} from 'next/navigation';
+import {AlertCircle} from "lucide-react";
 import {useNewCollectionContext} from "@/components/collections/context/NewCollectionContext";
 import {useAuth} from "@/contexts/AuthContext";
+import {FolderSelection} from "@/components/collections/FolderSelection";
+import {SelectedFolder} from "@/components/collections/SelectedFolder";
 import {InputWithButton} from "@/components/collections/InputWithButton";
-import {XCircleIcon} from "lucide-react";
 import {collectionsService} from "@/services/collectionService";
 import {CollectionStatusEvent, CollectionType, CreateCollectionResponse} from "@/types/collections";
-import {useRouter} from 'next/navigation';
-import {Steps, StepStatus} from "@/components/Steps";
 
-const defaultSteps = [
+// Step interface and default steps
+interface Step {
+    id: string;
+    name: string;
+    status: StepStatus;
+}
+
+enum StepStatus {
+    NOT_STARTED = 'not-started',
+    IN_PROGRESS = 'in-progress',
+    COMPLETED = 'completed'
+}
+
+const defaultSteps: Step[] = [
     {id: '01', name: 'Select Folder', status: StepStatus.NOT_STARTED},
     {id: '02', name: 'Select Files', status: StepStatus.NOT_STARTED},
-    {id: '03', name: 'Add Collection Name', status: StepStatus.NOT_STARTED},
+    {id: '03', name: 'Add Details', status: StepStatus.NOT_STARTED},
     {id: '04', name: 'Create Collection', status: StepStatus.NOT_STARTED},
-]
+];
 
+// Helper function for generating unique IDs
 let fileCounter = 0;
 const generateId = () => `pdf-${fileCounter++}`;
 
 export const NewCollectionTool = () => {
-    // const [steps, setSteps] = React.useState<Step[]>(defaultSteps)
     const router = useRouter();
-    const [collectionCreationLoading, setCollectionCreationLoading] = React.useState<boolean>(false)
-    const [steps, setSteps] = React.useState(defaultSteps);
-    // Example state that changes based on user input or other logic
+    const [collectionCreationLoading, setCollectionCreationLoading] = React.useState<boolean>(false);
+    const [steps, setSteps] = React.useState<Step[]>(defaultSteps);
     const [collectionId, setCollectionId] = React.useState<string | null>(null);
-
-    // Once `shouldNavigate` is true, navigate to the dynamic page
-    React.useEffect(() => {
-        if (collectionId) {
-            router.push(`/collections/${collectionId}`);
-        }
-    }, [collectionId, router]);
-
 
     const {
         pdfFiles,
@@ -50,17 +53,19 @@ export const NewCollectionTool = () => {
         setShowError
     } = useNewCollectionContext();
 
-    const savedTenant = localStorage.getItem('tenant')
-    let savedTenantJson = null
-    if (savedTenant) {
-        savedTenantJson = JSON.parse(savedTenant)
-    }
+    const {authUser, loading} = useAuth();
     const fileInputRef = React.createRef<HTMLInputElement>();
     const [isCollectionNameValid, setIsCollectionNameValid] = React.useState(false);
     const [, setCollectionStatus] = React.useState<CollectionStatusEvent | null>(null);
 
-    const {authUser, loading} = useAuth();
+    // Navigate to collection page after creation
+    React.useEffect(() => {
+        if (collectionId) {
+            router.push(`/collections/${collectionId}`);
+        }
+    }, [collectionId, router]);
 
+    // Update steps based on user progress
     React.useEffect(() => {
         // Create new array to avoid mutating state directly
         const updatedSteps = [...steps];
@@ -101,114 +106,9 @@ export const NewCollectionTool = () => {
         if (JSON.stringify(steps) !== JSON.stringify(updatedSteps)) {
             setSteps(updatedSteps);
         }
-
     }, [pdfFiles, collectionName, isCollectionNameValid, steps]);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const {isValid, errorMessage} = validateInput(collectionName);
-
-        if (!isValid) {
-            setShowError(true);
-            // Optionally update the error state here.
-            setError(errorMessage);
-            return;
-        }
-        // set up create collection response
-        let collectionCreationResponse: CreateCollectionResponse | undefined = undefined
-
-        if (pdfFiles.length === 0) {
-            setError('No folder selected.');
-            return;
-        }
-        // alert for not having selected any files
-        const selectedFiles = pdfFiles.filter(file => file.selected);
-        if (selectedFiles.length === 0) {
-            setError('Please select at least one PDF file to process.');
-            return;
-        }
-
-        if (collectionName.length === 0) {
-            setError('Please enter a collection name.');
-            return;
-        }
-
-        // set vars
-        setCollectionCreationLoading(true)
-        setIsProcessing(true);
-        setError('');
-        setSuccess('');
-
-        try {
-            if (!authUser || !authUser.email) {
-                throw new Error('User information not available');
-            }
-
-            if (!savedTenantJson) {
-                console.log("Tenant not found in local storage")
-                throw new Error('Tenant information not available');
-            }
-
-            const filesMap: Record<string, string> = {};
-            for (const pdfFile of selectedFiles) {
-                filesMap[pdfFile.file.name] = pdfFile.file.type
-            }
-
-            collectionCreationResponse = await collectionsService.createCollection(
-                collectionName,
-                CollectionType.INVOICE,
-                filesMap,
-                new Map<string, string>([
-                    ['tenantId', savedTenantJson.id],
-                    ['email', authUser.email]
-                ])
-            );
-
-            if (collectionCreationResponse === undefined) {
-                throw new Error('Failed to create collection');
-            } else {
-                setCollectionId(collectionCreationResponse.id)
-            }
-
-            // create map of pdf files with name and file value from selected file
-            const selectedFileMap: { [key: string]: File } = {}
-            selectedFiles.map(file => {
-                selectedFileMap[file.file.name] = file.file
-            })
-
-            console.log("Here is the response from the collection creation", collectionCreationResponse)
-            await Promise.all(
-                Object.keys(collectionCreationResponse.documents).map(async (key) => {
-                    const signedUrlData = collectionCreationResponse!!.documents[key].uploadUrl;
-                    const fileName = collectionCreationResponse!!.documents[key].fileName;
-                    const documentId = collectionCreationResponse!!.documents[key].documentId;
-                    console.log('Signed URL data:', signedUrlData)
-                    if (signedUrlData) {
-                        console.log('Uploading file:', fileName, documentId, signedUrlData);
-                        await collectionsService.uploadFile(signedUrlData, selectedFileMap[fileName]);
-                        console.log('File uploaded:', fileName, documentId, signedUrlData);
-                    }
-                })
-            );
-
-
-            setSuccess(`Successfully uploaded ${selectedFiles.length} PDF files!`);
-            setProcessedData(collectionCreationResponse.documents);
-            setSuccess(`Successfully processed ${selectedFiles.length} PDF files!`);
-
-            // Select the first result by default
-            const firstFileName = Object.keys(collectionCreationResponse.documents)[0];
-            if (firstFileName) {
-                setSelectedResult(firstFileName);
-            }
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to process PDFs');
-        } finally {
-            setIsProcessing(false);
-        }
-
-    };
-
+    // Form validation
     const validateInput = (value: string) => {
         // check if folder is selected
         if (pdfFiles.length === 0) {
@@ -223,37 +123,38 @@ export const NewCollectionTool = () => {
         if (selectedFiles.length === 0) {
             return {
                 isValid: false,
-                errorMessage: 'Please select at least one PDF file to process.'
+                errorMessage: 'Please select at least one file to process.'
             };
         }
+
         if (value.length < 4) {
-            setIsCollectionNameValid(false)
+            setIsCollectionNameValid(false);
             return {
                 isValid: false,
-                errorMessage: 'Input must be at least 4 characters.'
-            }
+                errorMessage: 'Collection name must be at least 4 characters.'
+            };
         }
+
         // Check for length between 0 and 100
         if (value.length > 100) {
-            setIsCollectionNameValid(false)
+            setIsCollectionNameValid(false);
             return {
                 isValid: false,
-                errorMessage: 'Input must be less than 100 characters'
+                errorMessage: 'Collection name must be less than 100 characters.'
             };
         }
 
         // Check for allowed characters only (letters, numbers, underscore, dash, and period)
         const validCharacterRegex = /^[a-zA-Z0-9._-]*$/;
         if (!validCharacterRegex.test(value)) {
-            setIsCollectionNameValid(false)
-            setError('Only letters, numbers, underscores (_), dashes (-), and periods (.) are allowed')
+            setIsCollectionNameValid(false);
             return {
                 isValid: false,
-                errorMessage: 'Only letters, numbers, underscores (_), dashes (-), and periods (.) are allowed'
+                errorMessage: 'Only letters, numbers, underscores (_), dashes (-), and periods (.) are allowed.'
             };
         }
 
-        setIsCollectionNameValid(true)
+        setIsCollectionNameValid(true);
         return {
             isValid: true,
             errorMessage: ''
@@ -267,6 +168,7 @@ export const NewCollectionTool = () => {
         'image/png': ['png'],
         'image/tiff': ['tif', 'tiff']
     };
+
     // Helper function to check if file is supported
     const isFileSupported = (file: File): boolean => {
         // Check MIME type first
@@ -279,32 +181,26 @@ export const NewCollectionTool = () => {
         return Object.values(SUPPORTED_FILE_TYPES).flat().includes(extension || '');
     };
 
-
     const handleFolderSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
-        console.log('Raw files from input:', files);
 
-        const pdfFiles = files
+        const filteredFiles = files
             .filter(isFileSupported)
-            // .filter(file => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'))
             .map(file => {
-                // Keep the original File object in a property
                 return {
                     id: generateId(),
-                    selected: false,
+                    selected: true, // Pre-select files for better UX
                     name: file.name,
                     webkitRelativePath: file.webkitRelativePath,
                     type: file.type,
                     size: file.size,
                     lastModified: file.lastModified,
-                    // Store the actual File object
                     file: file,
                     fileType: file.type.includes('pdf') ? 'pdf' : 'image'
                 };
             });
 
-        console.log('Processed PDF files:', pdfFiles);
-        setPdfFiles(pdfFiles);
+        setPdfFiles(filteredFiles);
         setError('');
         setSuccess('');
         setProcessedData({});
@@ -312,50 +208,196 @@ export const NewCollectionTool = () => {
 
         if (files.length === 0) {
             setError('No folder selected.');
-            setShowError(true)
-        } else if (pdfFiles.length === 0) {
+            setShowError(true);
+        } else if (filteredFiles.length === 0) {
             setError('No supported files found in the selected folder. Please upload PDFs or images (JPEG, PNG, TIFF).');
-            setShowError(true)
+            setShowError(true);
         }
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        const {isValid, errorMessage} = validateInput(collectionName);
 
+        if (!isValid) {
+            setShowError(true);
+            setError(errorMessage);
+            return;
+        }
+
+        // Prepare for collection creation
+        let collectionCreationResponse: CreateCollectionResponse | undefined = undefined;
+        const selectedFiles = pdfFiles.filter(file => file.selected);
+
+        // Final validation checks
+        if (pdfFiles.length === 0) {
+            setError('No folder selected.');
+            setShowError(true);
+            return;
+        }
+
+        if (selectedFiles.length === 0) {
+            setError('Please select at least one file to process.');
+            setShowError(true);
+            return;
+        }
+
+        if (collectionName.length === 0) {
+            setError('Please enter a collection name.');
+            setShowError(true);
+            return;
+        }
+
+        // Begin collection creation process
+        setCollectionCreationLoading(true);
+        setIsProcessing(true);
+        setError('');
+        setSuccess('');
+
+        try {
+            const savedTenant = localStorage.getItem('tenant');
+            let savedTenantJson = null;
+            if (savedTenant) {
+                savedTenantJson = JSON.parse(savedTenant);
+            }
+
+            if (!authUser || !authUser.email) {
+                throw new Error('User information not available');
+            }
+
+            if (!savedTenantJson) {
+                throw new Error('Tenant information not available');
+            }
+
+            // Create files map for backend
+            const filesMap: Record<string, string> = {};
+            for (const pdfFile of selectedFiles) {
+                filesMap[pdfFile.file.name] = pdfFile.file.type;
+            }
+
+            // Create collection
+            collectionCreationResponse = await collectionsService.createCollection(
+                collectionName,
+                CollectionType.INVOICE,
+                filesMap,
+                new Map<string, string>([
+                    ['tenantId', savedTenantJson.id],
+                    ['email', authUser.email]
+                ])
+            );
+
+            if (collectionCreationResponse === undefined) {
+                throw new Error('Failed to create collection');
+            } else {
+                setCollectionId(collectionCreationResponse.id);
+            }
+
+            // Create map of selected files
+            const selectedFileMap: { [key: string]: File } = {};
+            selectedFiles.forEach(file => {
+                selectedFileMap[file.file.name] = file.file;
+            });
+
+            // Upload files using signed URLs
+            await Promise.all(
+                Object.keys(collectionCreationResponse.documents).map(async (key) => {
+                    const signedUrlData = collectionCreationResponse!.documents[key].uploadUrl;
+                    const fileName = collectionCreationResponse!.documents[key].fileName;
+                    const documentId = collectionCreationResponse!.documents[key].documentId;
+
+                    if (signedUrlData) {
+                        await collectionsService.uploadFile(signedUrlData, selectedFileMap[fileName]);
+                    }
+                })
+            );
+
+            // Update UI with success
+            setSuccess(`Successfully processed ${selectedFiles.length} files!`);
+            setProcessedData(collectionCreationResponse.documents);
+
+            // Select the first result by default
+            const firstFileName = Object.keys(collectionCreationResponse.documents)[0];
+            if (firstFileName) {
+                setSelectedResult(firstFileName);
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Failed to process files');
+            setShowError(true);
+        } finally {
+            setIsProcessing(false);
+            setCollectionCreationLoading(false);
+        }
+    };
+
+    // Render the component
     return (
-        <div className={"rounded-xl pt-8"}>
-            <Steps steps={steps}/>
-            {showError && error.length > 0 && (
-                <div className="rounded-md bg-red-50 p-4 mb-4">
-                    <div className="flex">
-                        <div className="shrink-0">
-                            <XCircleIcon aria-hidden="true" className="size-5 text-red-400"/>
-                        </div>
-                        <div className="ml-3">
-                            <h3 className="text-sm font-medium text-red-800">{error}</h3>
-                        </div>
-                    </div>
-                </div>
+        <div className="w-full max-w-8xl mx-auto">
+            {/* Progress Steps */}
+            <div className="mb-8">
+                <div className="flex items-center">
+                    {steps.map((step, index) => (
+                        <React.Fragment key={step.id}>
+                            {/* Step Circle */}
+                            <div className="flex flex-col items-center">
+                                <div
+                                    className={`flex items-center justify-center w-8 h-8 rounded-full font-medium text-sm ${
+                                        step.status === StepStatus.COMPLETED
+                                            ? 'bg-sky-600 text-white'
+                                            : step.status === StepStatus.IN_PROGRESS
+                                                ? 'bg-sky-100 text-sky-800 border-2 border-sky-600'
+                                                : 'bg-gray-100 text-gray-400'
+                                    }`}
+                                >
+                                    {index + 1}
+                                </div>
+                                <div className="mt-2 text-xs font-medium text-gray-700">{step.name}</div>
+                            </div>
 
+                            {/* Connector line between steps */}
+                            {index < steps.length - 1 && (
+                                <div className="flex-1 mx-2">
+                                    <div
+                                        className={`h-0.5 ${
+                                            step.status === StepStatus.COMPLETED
+                                                ? 'bg-sky-600'
+                                                : 'bg-gray-200'
+                                        }`}
+                                    />
+                                </div>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </div>
+            </div>
+
+            {/* Error Alert */}
+            {showError && error && (
+                <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 flex items-start">
+                    <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-2 shrink-0"/>
+                    <p className="text-sm">{error}</p>
+                </div>
             )}
 
-            <div className="space-y-4">
+            {/* Folder Selection or Selected Files */}
+            <div className="space-y-6">
+                {pdfFiles.length === 0 ? (
+                    <FolderSelection
+                        fileInputRef={fileInputRef}
+                        handleFolderSelect={handleFolderSelect}
+                    />
+                ) : (
+                    <SelectedFolder
+                        fileInputRef={fileInputRef}
+                        handleFolderSelect={handleFolderSelect}
+                    />
+                )}
 
-                {pdfFiles.length === 0 ?
-                    (
-                        <>
-                            <FolderSelection fileInputRef={fileInputRef} handleFolderSelect={handleFolderSelect}/>
-                        </>
-
-                    ) : (
-                        <SelectedFolder fileInputRef={fileInputRef} handleFolderSelect={handleFolderSelect}/>
-                    )
-                }
+                {/* Collection Details */}
                 <InputWithButton
                     loading={collectionCreationLoading}
                     handleSubmit={handleSubmit}
                 />
-
-
             </div>
         </div>
-    )
-}
+    );
+};

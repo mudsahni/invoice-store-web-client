@@ -1,5 +1,5 @@
-import React from 'react'
-import {FolderOpen} from "lucide-react";
+import React from 'react';
+import {FolderUp} from "lucide-react";
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -7,7 +7,6 @@ declare module 'react' {
         directory?: string | boolean;
     }
 }
-
 
 interface FolderSelectionProps {
     fileInputRef: React.RefObject<HTMLInputElement>;
@@ -18,13 +17,8 @@ export const FolderSelection: React.FC<FolderSelectionProps> = ({
                                                                     fileInputRef,
                                                                     handleFolderSelect
                                                                 }) => {
-
-    const handleBrowseClick = () => {
-        fileInputRef.current?.click();
-    };
-
     return (
-        <div className="rounded-lg p-2 bg-sky-100">
+        <div className="w-full">
             <input
                 type="file"
                 ref={fileInputRef}
@@ -36,23 +30,38 @@ export const FolderSelection: React.FC<FolderSelectionProps> = ({
             />
             <div
                 onClick={() => fileInputRef.current?.click()}
-                className="group relative cursor-pointer rounded-lg bg-sky-50 border-2 border-dashed border-gray-300 p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2"
+                className="group cursor-pointer transition-all duration-300 ease-in-out
+                   bg-white border border-gray-200 hover:border-sky-500 hover:shadow-md
+                   rounded-lg p-12 text-center flex flex-col items-center justify-center"
             >
-                <div className="mx-auto flex flex-col items-center">
-                    <FolderOpen
-                        className="h-12 w-12 text-gray-400 group-hover:text-sky-600 transition-colors duration-300"/>
-                    <div className="mt-4">
-                        <h3 className="text-sm font-medium text-gray-900">
-                            Click to select a folder
-                        </h3>
-                        <p className="mt-1 text-xs text-gray-500">
-                            Only PDF files will be processed
-                        </p>
+                <div className="flex flex-col items-center transition-transform group-hover:scale-105 duration-300">
+                    <div className="p-4 mb-3 bg-sky-50 rounded-full transition-colors group-hover:bg-sky-100">
+                        <FolderUp
+                            className="h-8 w-8 text-sky-600 group-hover:text-sky-700"
+                            strokeWidth={1.5}
+                        />
                     </div>
+                    <h3 className="text-lg font-medium text-gray-800 mt-2">
+                        Select a folder
+                    </h3>
+                    <p className="mt-2 text-sm text-gray-500 max-w-sm">
+                        Upload PDF files, JPG, PNG or TIFF images to create your collection
+                    </p>
+                    <button
+                        className="mt-5 px-5 py-2 bg-sky-600 text-white rounded-lg
+                     hover:bg-sky-700 transition-colors font-medium text-sm"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            fileInputRef.current?.click();
+                        }}
+                    >
+                        Browse Folders
+                    </button>
                 </div>
-                <div
-                    className="absolute inset-0 bg-gradient-to-br from-transparent via-gray-50/5 to-gray-50/10 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+                <p className="mt-6 text-xs text-gray-400">
+                    Supported formats: PDF, JPG, PNG, TIFF
+                </p>
             </div>
         </div>
-    )
-}
+    );
+};
