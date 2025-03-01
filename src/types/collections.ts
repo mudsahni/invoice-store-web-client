@@ -115,7 +115,7 @@ export enum ErrorSeverity {
 export interface StructuredData {
     raw?: string;
     structured?: InvoiceWrapper;
-    errors?: { [key: string]: { field: string, message: string, severity?: ErrorSeverity } }
+    errors?: { [key: string]: { field: string, message: string, severity: ErrorSeverity } }
 }
 
 export interface DocumentError {
