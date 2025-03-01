@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import {InvoiceContext} from "@/components/invoices/context/InvoiceContext";
 import {Invoice} from "@/types/invoice";
+import {ErrorSeverity} from "@/types/collections";
 
 interface InvoiceContextProviderProps {
     children: React.ReactNode
@@ -9,7 +10,9 @@ interface InvoiceContextProviderProps {
 export const InvoiceContextProvider: React.FC<InvoiceContextProviderProps> = ({children}) => {
     const [edit, setEdit] = React.useState<boolean>(false);
     const [invoice, setInvoice] = useState<Invoice>({})
-    const [validationErrors, setValidationErrors] = useState<{ [key: string]: { field: string, message: string } }>({})
+    const [validationErrors, setValidationErrors] = useState<{
+        [key: string]: { field: string, message: string, severity: ErrorSeverity }
+    }>({})
     const [editableInvoice, setEditableInvoice] = useState<Invoice>({})
 
     // Single handler for all invoice updates

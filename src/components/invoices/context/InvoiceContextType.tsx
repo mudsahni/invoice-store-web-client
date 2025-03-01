@@ -11,6 +11,8 @@ export interface InvoiceContextType {
     editableInvoice: Invoice;
     setEditableInvoice: (value: React.SetStateAction<Invoice>) => void;
     validationErrors?: { [key: string]: { field: string, message: string, severity: ErrorSeverity } };
-    setValidationErrors: (value: React.SetStateAction<{ [key: string]: { field: string, message: string } }>) => void;
+    setValidationErrors: (value: React.SetStateAction<{
+        [key: string]: { field: string, message: string, severity: ErrorSeverity }
+    }>) => void;
     handleInvoiceChange: (path: string, value: string) => void;
 }
