@@ -1,6 +1,7 @@
 import React from 'react'
 import {parse, format, isValid} from 'date-fns';
 import {ExclamationCircleIcon} from "@heroicons/react/16/solid";
+import {ErrorSeverity} from "@/types/collections";
 
 
 interface DocumentFieldProps {
@@ -11,6 +12,7 @@ interface DocumentFieldProps {
     disabled: boolean,
     value?: string | number,
     error?: string,
+    severity?: ErrorSeverity
 }
 
 const parseDate = (dateString: string) => {
@@ -40,7 +42,8 @@ export const DocumentField: React.FC<DocumentFieldProps> = ({
                                                                 handleOnChange,
                                                                 disabled,
                                                                 value,
-                                                                error
+                                                                error,
+                                                                severity = ErrorSeverity.MINOR
                                                             }) => {
 
 
@@ -99,7 +102,7 @@ export const DocumentField: React.FC<DocumentFieldProps> = ({
             {
                 error &&
                 <div
-                    className="flex rounded-md align-middle items-center space-x-4 justify-start bg-red-50 text-red-800 border text-sm py-1 px-2 my-2 border-red-800">
+                    className={`${severity !== ErrorSeverity.MINOR ? "bg-red-50 text-red-800 border-red-800" : "bg-yellow-50 text-yellow-800 border-yellow-800"} flex rounded-md align-middle items-center space-x-4 justify-start border text-sm py-1 px-2 my-2`}>
                     <ExclamationCircleIcon className="h-5"/>
                     <span>{error}</span>
                 </div>

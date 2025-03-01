@@ -5,13 +5,14 @@ import {OptionsMenu} from "@/components/collection/OptionsMenu";
 import {allExpanded, defaultStyles, JsonView} from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
 import {StyleProps} from "react-json-view-lite/dist/DataRenderer";
-import {getOptionsMenu} from "@/components/collection/utils";
+import {ErrorDisplay, getOptionsMenu} from "@/components/collection/utils";
 import {documentService} from "@/services/documentService";
 import {CacheManager} from "@/services/cacheManager";
 import {SheetIcon} from "lucide-react";
 import TablePagination from "@/components/ui/Pagination";
 import {collectionsService} from "@/services/collectionService";
 import {LoadingSpinner} from "@/components/LoadingSpinner";
+import {getStatusStyles} from "@/components/collections/utils";
 
 export interface DocumentTableProps {
     collectionId: string;
@@ -77,6 +78,7 @@ const DOCUMENT_TABLE_COLS = [
     "Type",
     "Last Update",
     "Status",
+    "Errors",
     ""
 ]
 
@@ -206,7 +208,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
                                     DOCUMENT_TABLE_COLS.map((header, index) => (
                                         <th key={index}
                                             scope="col"
-                                            className={`${index === 0 ? "pl-4 pr-3 sm:pl-0" : index === DOCUMENT_TABLE_COLS.length - 1 ? "relative pl-3 pr-4 sm:pr-0" : "px-3"} py-3.5 text-left text-sm font-semibold text-gray-800`}>
+                                            className={`${index === 0 ? "pl-4 pr-3 sm:pl-0" : index === DOCUMENT_TABLE_COLS.length - 1 ? "relative pl-3 pr-4 sm:pr-0" : "px-3"} ${index === 0 || index === DOCUMENT_TABLE_COLS.length - 1 ? "table-cell" : "sm:table-cell hidden"} py-3.5 text-left text-sm font-semibold text-gray-800`}>
                                             {index === DOCUMENT_TABLE_COLS.length - 1 ?
                                                 <span className="sr-only">Options</span>
                                                 : header}
@@ -222,27 +224,27 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
 
                                         <tr key={key}
                                             className={`bg-neutral-100 bg-opacity-0 hover:bg-opacity-40 transition-colors ${openRow === key ? 'bg-opacity-40' : ''}`}>
-                                            <td className="whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0">
+                                            <td className={`whitespace-nowrap py-5 pl-4 pr-3 text-sm sm:pl-0 sm:max-w-full max-w-xs sm:border-0 border-l-2 ${getStatusStyles(value.status).border}`}>
                                                 <div className="flex items-center align-middle">
                                                     <div
-                                                        className="cursor-pointer"
+                                                        className="cursor-pointer w-full overflow-hidden truncate"
                                                         onClick={() => toggleRow(key)}
                                                     >
                                                         <div className="flex align-middle items-center">
                                                             <DocumentTextIcon className="h-4 mr-1 text-gray-700"/>
                                                             <div
-                                                                className="font-medium text-gray-700">{value.name}</div>
+                                                                className="font-medium text-gray-700 truncate overflow-hidden">{value.name}</div>
                                                             <ChevronDownIcon
                                                                 className={`h-4 ml-2 transition-transform duration-200 ${openRow === key ? 'rotate-180' : ''}`}
                                                             />
                                                         </div>
                                                         <div
-                                                            className="mt-1 text-gray-500">{`Id: ${value.id}`}</div>
+                                                            className="mt-1 text-gray-500 truncate overflow-hidden">{`Id: ${value.id}`}</div>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            <td className="whitespace-nowrap px-3 py-5 text-sm">
+                                            <td className="sm:table-cell hidden whitespace-nowrap px-3 py-5 text-sm">
                                                     <span
                                                         className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
                                                         {value.type}
@@ -250,21 +252,24 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
                                                 {/*<div*/}
                                                 {/*    className="mt-1 text-gray-500">{person.department}</div>*/}
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-5 text-sm text-gray-700">
+                                            <td className="sm:table-cell hidden whitespace-nowrap px-3 py-5 text-sm text-gray-700">
                                                 {
                                                     value.updatedBy !== undefined ? (
                                                         <em className="">This document has never been
-                                                            udpated.</em>
+                                                            updated.</em>
                                                     ) : (
-                                                        <span>Crapbag</span>
+                                                        <span>{value.updatedBy}</span>
                                                     )
                                                 }
                                             </td>
-                                            <td className="whitespace-nowrap px-3 py-5 text-sm">
+                                            <td className="whitespace-nowrap px-3 py-5 text-sm sm:table-cell hidden">
                                                     <span
                                                         className="inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
                                                         {value.status}
                                                     </span>
+                                            </td>
+                                            <td className="whitespace-nowrap px-3 py-5 text-sm sm:table-cell hidden">
+                                                <ErrorDisplay errors={value.data.errors || {}}/>
                                             </td>
                                             <td className="relative whitespace-nowrap py-5 pl-3 pr-4 text-right text-base font-medium sm:pr-0">
                                                 {

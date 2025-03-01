@@ -1,4 +1,4 @@
-import {CollectionStatus, CollectionWithDocuments} from "@/types/collections";
+import {CollectionStatus, CollectionWithDocuments, ErrorSeverity} from "@/types/collections";
 import React from 'react'
 import {
     ArchiveBoxXMarkIcon,
@@ -8,6 +8,7 @@ import {
     PencilSquareIcon
 } from '@heroicons/react/20/solid'
 import {LoadingSpinner} from "@/components/LoadingSpinner";
+import {ExclamationCircleIcon} from "@heroicons/react/16/solid";
 
 const COLLECTION_CACHE_PREFIX = "collection_"
 // Cache configuration
@@ -164,3 +165,63 @@ export const getOptionsMenu = (collectionId: string, documentId: string, downloa
 
 ]
 
+interface ErrorDisplayProps {
+    errors: { [key: string]: { field: string, message: string, severity?: ErrorSeverity } }
+}
+
+export const ErrorDisplay: React.FC<ErrorDisplayProps> = ({errors}) => {
+    console.log(errors)
+    // Return early if errors is undefined or empty
+    if (!errors || Object.keys(errors).length === 0) {
+        return <span>No errors</span>;
+    }
+
+    // Filter errors by severity with proper type checking
+    const criticalErrorsCount = Object.values(errors).filter(
+        (error) => error.severity?.toString().toUpperCase() === ErrorSeverity.CRITICAL.toString()
+    ).length;
+    console.log(criticalErrorsCount)
+    const majorErrorsCount = Object.values(errors).filter(
+        (error) => error.severity?.toString().toUpperCase() === ErrorSeverity.MAJOR.toString()
+    ).length;
+
+    const minorErrorsCount = Object.values(errors).filter(
+        (error) => error.severity?.toString().toUpperCase() === ErrorSeverity.MINOR.toString()
+    ).length;
+
+    // If no categorized errors are found, check if there are any errors without severity
+
+    return (
+        <div className="flex flex-col items-start justify-start align-middle">
+            {criticalErrorsCount > 0 && (
+                <div
+                    className="bg-red-50 text-red-800 border-red-800 flex rounded-md items-center space-x-2 justify-start border text-sm py-1 px-2 my-2 w-full">
+                    <ExclamationCircleIcon className="h-5 flex-shrink-0"/>
+                    <span>{criticalErrorsCount} critical errors</span>
+                </div>
+            )}
+
+            {majorErrorsCount > 0 && (
+                <div
+                    className="bg-orange-50 text-orange-800 border-orange-800 flex rounded-md items-center align-middle space-x-2 justify-start border text-sm py-1 px-2 my-2 w-full">
+                    <ExclamationCircleIcon className="h-5 flex-shrink-0"/>
+                    <span>{majorErrorsCount} major errors</span>
+                </div>
+            )}
+
+            {minorErrorsCount > 0 && (
+                <div
+                    className="bg-yellow-50 text-yellow-800 border-yellow-800 flex rounded-md items-center align-middle justify-start space-x-2 border text-sm py-1 px-2 my-2 w-[80%]">
+                    <ExclamationCircleIcon className="h-5 flex-shrink-0"/>
+                    <span>{minorErrorsCount} minor errors</span>
+                </div>
+            )}
+
+
+            {/* Show "No errors" only if there are no errors at all */}
+            {minorErrorsCount === 0 && majorErrorsCount === 0 && criticalErrorsCount === 0 && (
+                <span>No errors</span>
+            )}
+        </div>
+    );
+};

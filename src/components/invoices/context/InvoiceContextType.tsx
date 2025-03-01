@@ -1,5 +1,6 @@
 import {Invoice} from "@/types/invoice";
 import React from "react";
+import {ErrorSeverity} from "@/types/collections";
 
 
 export interface InvoiceContextType {
@@ -9,7 +10,7 @@ export interface InvoiceContextType {
     setInvoice: (value: React.SetStateAction<Invoice>) => void;
     editableInvoice: Invoice;
     setEditableInvoice: (value: React.SetStateAction<Invoice>) => void;
-    validationErrors?: { [key: string]: { field: string, message: string } };
+    validationErrors?: { [key: string]: { field: string, message: string, severity: ErrorSeverity } };
     setValidationErrors: (value: React.SetStateAction<{ [key: string]: { field: string, message: string } }>) => void;
     handleInvoiceChange: (path: string, value: string) => void;
 }

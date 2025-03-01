@@ -24,6 +24,7 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     disabled={!edit}
                     value={invoice.invoiceNumber || ''}
                     error={errors['invoice.invoiceNumber']?.message}
+                    severity={errors['invoice.invoiceNumber']?.severity}
                 />
                 <DocumentField
                     label="Currency Code"
@@ -33,6 +34,7 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     disabled={!edit}
                     value={invoice.currencyCode || ''}
                     error={errors['invoice.currencyCode']?.message}
+                    severity={errors['invoice.currencyCode']?.severity}
                 />
                 <DocumentField
                     label="Billing Date"
@@ -42,6 +44,7 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     disabled={!edit}
                     value={invoice.billingDate}
                     error={errors['invoice.billingDate']?.message}
+                    severity={errors['invoice.billingDate']?.severity}
                 />
                 <DocumentField
                     label="Due Date"
@@ -51,6 +54,7 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     disabled={!edit}
                     value={invoice.dueDate ? new Date(invoice.dueDate).toISOString().split('T')[0] : ''}
                     error={errors['invoice.dueDate']?.message}
+                    severity={errors['invoice.dueDate']?.severity}
                 />
                 <DocumentField
                     label="Place of Supply"
@@ -60,6 +64,7 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     disabled={!edit}
                     value={invoice.placeOfSupply || ''}
                     error={errors['invoice.placeOfSupply']?.message}
+                    severity={errors['invoice.placeOfSupply']?.severity}
                 />
                 <DocumentField
                     label="IRN Number"
@@ -69,6 +74,7 @@ export const BasicDetails: React.FC<BasicDetailsProps> = () => {
                     disabled={!edit}
                     value={invoice.irnNumber || ''}
                     error={errors['invoice.irnNumber']?.message}
+                    severity={errors['invoice.irnNumber']?.severity}
                 />
             </div>
         </div>

@@ -105,10 +105,17 @@ export interface Collection {
     updatedBy: string;
 }
 
+export enum ErrorSeverity {
+    MINOR = "MINOR",
+    MAJOR = "MAJOR",
+    CRITICAL = "CRITICAL"
+
+}
+
 export interface StructuredData {
     raw?: string;
     structured?: InvoiceWrapper;
-    errors?: { [key: string]: { field: string, message: string } }
+    errors?: { [key: string]: { field: string, message: string, severity?: ErrorSeverity } }
 }
 
 export interface DocumentError {
