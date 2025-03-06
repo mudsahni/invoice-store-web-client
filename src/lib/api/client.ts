@@ -4,8 +4,16 @@ import {Tenant} from "@/types/auth";
 interface ApiClientOptions {
     baseUrlPrefix: string;
     baseUrlSuffix?: string;
-    timeout?: number;
+    defaultTimeout?: number;
 }
+
+interface RequestOptions {
+    timeout?: number;
+    retryCount?: number;
+    retryDelay?: number;
+    headers?: Record<string, string>;
+}
+
 
 interface ApiError extends Error {
     status?: number;
@@ -15,12 +23,12 @@ interface ApiError extends Error {
 export class ApiClient {
     private readonly baseUrlPrefix: string;
     private readonly baseUrlSuffix?: string;
-    private readonly timeout: number;
+    private readonly defaultTimeout: number;
 
     constructor(options: ApiClientOptions) {
         this.baseUrlPrefix = options.baseUrlPrefix;
         this.baseUrlSuffix = options.baseUrlSuffix;
-        this.timeout = options.timeout || 10000; // Default 10s timeout
+        this.defaultTimeout = options.defaultTimeout || 30000; // Default 30s timeout (increased from 10s)
     }
 
 
@@ -46,9 +54,10 @@ export class ApiClient {
     }
 
 
-    private async getHeaders(): Promise<HeadersInit> {
+    private async getHeaders(customHeaders?: Record<string, string>): Promise<HeadersInit> {
         const headers: HeadersInit = {
             'Content-Type': 'application/json',
+            ...customHeaders
         };
 
         // Get fresh token
@@ -63,10 +72,13 @@ export class ApiClient {
 
     private async fetchWithTimeout(
         url: string,
-        options: RequestInit
+        options: RequestInit & { timeout?: number }
     ): Promise<Response> {
+        const timeout = options.timeout || this.defaultTimeout;
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+        const timeoutId = setTimeout(() => {
+            controller.abort(`Request timed out after ${timeout}ms`);
+        }, timeout);
 
         try {
             return await fetch(url, {
@@ -101,90 +113,142 @@ export class ApiClient {
         return response.json();
     }
 
-    async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
-        const url = new URL(`${this.getBaseUrl()}${endpoint}`);
-        if (params) {
-            Object.entries(params).forEach(([key, value]) => {
-                url.searchParams.append(key, value);
-            });
+    // Retry logic for failed requests
+    private async withRetry<T>(
+        operation: () => Promise<T>,
+        options: { retryCount?: number; retryDelay?: number } = {}
+    ): Promise<T> {
+        const maxRetries = options.retryCount || 0;
+        const delay = options.retryDelay || 1000;
+
+        let lastError: Error | null = null;
+
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+            try {
+                return await operation();
+            } catch (error) {
+                lastError = error instanceof Error ? error : new Error(String(error));
+
+                // Don't retry if we've reached max retries
+                if (attempt >= maxRetries) {
+                    break;
+                }
+
+                // Don't retry if the request was aborted
+                if (error instanceof DOMException && error.name === 'AbortError') {
+                    break;
+                }
+
+                console.warn(`Request failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms`, error);
+
+                // Wait before retrying
+                await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, attempt)));
+            }
         }
 
-        const response = await this.fetchWithTimeout(url.toString(), {
-            method: 'GET',
-            headers: await this.getHeaders(),
-        });
-
-        return this.handleResponse<T>(response);
+        throw lastError || new Error('Request failed after retries');
     }
 
-    async post<T>(endpoint: string, data?: any): Promise<T> {
-        try {
+    async get<T>(endpoint: string, params?: Record<string, string>, options: RequestOptions = {}): Promise<T> {
+        return this.withRetry(async () => {
+            const url = new URL(`${this.getBaseUrl()}${endpoint}`);
+            if (params) {
+                Object.entries(params).forEach(([key, value]) => {
+                    url.searchParams.append(key, value);
+                });
+            }
+
+            const response = await this.fetchWithTimeout(url.toString(), {
+                method: 'GET',
+                headers: await this.getHeaders(options.headers),
+                timeout: options.timeout
+            });
+
+            return this.handleResponse<T>(response);
+        }, {retryCount: options.retryCount, retryDelay: options.retryDelay});
+    }
+
+    async post<T>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> {
+        return this.withRetry(async () => {
+            try {
+                console.log(`POST request to ${endpoint} with timeout ${options.timeout || this.defaultTimeout}ms`);
+
+                const response = await this.fetchWithTimeout(
+                    `${this.getBaseUrl()}${endpoint}`,
+                    {
+                        method: 'POST',
+                        headers: await this.getHeaders(options.headers),
+                        body: data ? JSON.stringify(data) : undefined,
+                        timeout: options.timeout
+                    }
+                );
+
+                console.log('Response status:', response.status);
+
+                return this.handleResponse<T>(response);
+            } catch (error) {
+                console.error('Fetch error:', error);
+                throw error;
+            }
+        }, {retryCount: options.retryCount, retryDelay: options.retryDelay});
+    }
+
+    async put<T>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> {
+        return this.withRetry(async () => {
             const response = await this.fetchWithTimeout(
                 `${this.getBaseUrl()}${endpoint}`,
                 {
-                    method: 'POST',
-                    headers: await this.getHeaders(),
+                    method: 'PUT',
+                    headers: await this.getHeaders(options.headers),
                     body: data ? JSON.stringify(data) : undefined,
+                    timeout: options.timeout
                 }
             );
 
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
+            return this.handleResponse<T>(response);
+        }, {retryCount: options.retryCount, retryDelay: options.retryDelay});
+    }
+
+
+    async patch<T>(endpoint: string, data?: any, options: RequestOptions = {}): Promise<T> {
+        return this.withRetry(async () => {
+            const response = await this.fetchWithTimeout(
+                `${this.getBaseUrl()}${endpoint}`,
+                {
+                    method: 'PATCH',
+                    headers: await this.getHeaders(options.headers),
+                    body: data ? JSON.stringify(data) : undefined,
+                    timeout: options.timeout
+                }
+            );
 
             return this.handleResponse<T>(response);
-        } catch (error) {
-            console.error('Fetch error:', error);
-            throw error;
-
-        }
+        }, {retryCount: options.retryCount, retryDelay: options.retryDelay});
     }
 
-    async put<T>(endpoint: string, data?: any): Promise<T> {
-        const response = await this.fetchWithTimeout(
-            `${this.getBaseUrl()}${endpoint}`,
-            {
-                method: 'PUT',
-                headers: await this.getHeaders(),
-                body: data ? JSON.stringify(data) : undefined,
-            }
-        );
+    async delete<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+        return this.withRetry(async () => {
+            const response = await this.fetchWithTimeout(
+                `${this.getBaseUrl()}${endpoint}`,
+                {
+                    method: 'DELETE',
+                    headers: await this.getHeaders(options.headers),
+                    timeout: options.timeout
+                }
+            );
 
-        return this.handleResponse<T>(response);
-    }
-
-    async patch<T>(endpoint: string, data?: any): Promise<T> {
-        const response = await this.fetchWithTimeout(
-            `${this.getBaseUrl()}${endpoint}`,
-            {
-                method: 'PATCH',
-                headers: await this.getHeaders(),
-                body: data ? JSON.stringify(data) : undefined,
-            }
-        );
-
-        return this.handleResponse<T>(response);
-    }
-
-    async delete<T>(endpoint: string): Promise<T> {
-        const response = await this.fetchWithTimeout(
-            `${this.getBaseUrl()}${endpoint}`,
-            {
-                method: 'DELETE',
-                headers: await this.getHeaders(),
-            }
-        );
-
-        return this.handleResponse<T>(response);
+            return this.handleResponse<T>(response);
+        }, {retryCount: options.retryCount, retryDelay: options.retryDelay});
     }
 
 
-    async stream<T>(endpoint: string, onEvent: (event: T) => void): Promise<() => void> {
+    async stream<T>(endpoint: string, onEvent: (event: T) => void, options: RequestOptions = {}): Promise<() => void> {
         const controller = new AbortController();
 
         const fetchAndStream = async () => {
             try {
                 console.log(`${new Date().toISOString()} Starting stream request to ${endpoint}`);
-                const headers = await this.getHeaders();
+                const headers = await this.getHeaders(options.headers);
 
                 const response = await fetch(`${this.getBaseUrl()}${endpoint}`, {
                     headers: {
@@ -211,6 +275,8 @@ export class ApiClient {
                     let currentEvent: { id?: string; event?: string; data?: string } = {};
 
                     for (const line of lines) {
+                        if (line.trim() === '') continue; // Skip empty lines
+
                         console.log('Processing line:', line); // Debug log
 
                         if (line.startsWith('id:')) {
@@ -273,22 +339,25 @@ export class ApiClient {
         };
     }
 
-    async getBlob(endpoint: string): Promise<Blob> {
-        const url = new URL(`${this.getBaseUrl()}${endpoint}`);
+    async getBlob(endpoint: string, options: RequestOptions = {}): Promise<Blob> {
+        return this.withRetry(async () => {
+            const url = new URL(`${this.getBaseUrl()}${endpoint}`);
 
-        const response = await this.fetchWithTimeout(url.toString(), {
-            method: 'GET',
-            headers: {
-                ...await this.getHeaders(),
-                'Accept': 'text/csv'  // Request CSV
-            },
-        });
+            const response = await this.fetchWithTimeout(url.toString(), {
+                method: 'GET',
+                headers: {
+                    ...await this.getHeaders(options.headers),
+                    'Accept': 'text/csv'  // Request CSV
+                },
+                timeout: options.timeout
+            });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
 
-        return response.blob();  // Return as blob directly
+            return response.blob();  // Return as blob directly
+        }, {retryCount: options.retryCount, retryDelay: options.retryDelay});
     }
 
 }

@@ -7,6 +7,8 @@ import {
     SignedUrlResponse, CollectionStatusEvent, GetCollectionsResponse, Collection, CollectionWithDocuments
 } from '@/types/collections';
 
+const EXTENDED_TIMEOUT = 120000; // 2 minutes
+
 export class CollectionsService {
 
     async getCollections(): Promise<GetCollectionsResponse> {
@@ -33,9 +35,22 @@ export class CollectionsService {
             tags
         };
 
+        // Adjust timeout based on number of files
+        const fileCount = Object.keys(files).length;
+        let timeout = 30000; // Base timeout: 30 seconds
+
+        // Scale timeout based on file count
+        if (fileCount > 10) {
+            timeout = Math.min(300000, 30000 + (fileCount * 3000)); // Cap at 5 minutes
+        }
+
+        console.log(`Creating collection with ${fileCount} files, using timeout of ${timeout}ms`);
+
+
         const response = await apiClient.post<CreateCollectionResponse>(
             API_ENDPOINTS.COLLECTIONS.CREATE,
-            request
+            request,
+            {timeout}
         );
 
         return response
