@@ -58,6 +58,45 @@ export const NewCollectionTool = () => {
     const [isCollectionNameValid, setIsCollectionNameValid] = React.useState(false);
     const [, setCollectionStatus] = React.useState<CollectionStatusEvent | null>(null);
 
+    // Function to upload files in batches
+    const uploadFilesBatched = async (documents: any, selectedFileMap: { [key: string]: File }, batchSize = 5) => {
+        const fileNames = Object.keys(documents);
+        const totalFiles = fileNames.length;
+        let uploadedCount = 0;
+
+        // Process files in batches
+        for (let i = 0; i < totalFiles; i += batchSize) {
+            const batch = fileNames.slice(i, i + batchSize);
+
+            // Upload current batch in parallel
+            await Promise.all(
+                batch.map(async (key) => {
+                    const signedUrlData = documents[key].uploadUrl;
+                    const fileName = documents[key].fileName;
+
+                    if (signedUrlData && selectedFileMap[fileName]) {
+                        try {
+                            await collectionsService.uploadFile(signedUrlData, selectedFileMap[fileName]);
+                            uploadedCount++;
+
+                            // Optional: Update UI to show progress
+                            setSuccess(`Uploading files: ${uploadedCount}/${totalFiles}`);
+                        } catch (error) {
+                            console.error(`Failed to upload ${fileName}:`, error);
+                            // Continue with other files even if one fails
+                        }
+                    }
+                })
+            );
+
+            // Small delay between batches to prevent overwhelming the network
+            if (i + batchSize < totalFiles) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        return uploadedCount;
+    };
     // Navigate to collection page after creation
     React.useEffect(() => {
         if (collectionId) {
@@ -298,19 +337,13 @@ export const NewCollectionTool = () => {
                 selectedFileMap[file.file.name] = file.file;
             });
 
-            // Upload files using signed URLs
-            await Promise.all(
-                Object.keys(collectionCreationResponse.documents).map(async (key) => {
-                    const signedUrlData = collectionCreationResponse!.documents[key].uploadUrl;
-                    const fileName = collectionCreationResponse!.documents[key].fileName;
-                    const documentId = collectionCreationResponse!.documents[key].documentId;
-
-                    if (signedUrlData) {
-                        await collectionsService.uploadFile(signedUrlData, selectedFileMap[fileName]);
-                    }
-                })
+            // Upload files in batches
+            const uploadedCount = await uploadFilesBatched(
+                collectionCreationResponse.documents,
+                selectedFileMap,
+                5  // Process 5 files at a time
             );
-
+            
             // Update UI with success
             setSuccess(`Successfully processed ${selectedFiles.length} files!`);
             setProcessedData(collectionCreationResponse.documents);

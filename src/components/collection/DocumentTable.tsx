@@ -98,7 +98,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
     };
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
-    const itemsPerPage = 10;
+    const [itemsPerPage, setItemsPerPage] = React.useState(10);
     // Calculate the indexes for the current page
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -312,6 +312,7 @@ export const DocumentTable: React.FC<DocumentTableProps> = ({collectionId, docum
                             totalItems={Object.entries(documents).length}
                             itemsPerPage={itemsPerPage}
                             onPageChange={setCurrentPage}
+                            onItemsPerPageChange={setItemsPerPage}
                         />
 
                     </div>

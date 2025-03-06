@@ -87,17 +87,7 @@ export const InvoicePage: React.FC<InvoicePageProps> = ({invoiceId}) => {
     const handleShowRawOrFile = () => {
         setShowRaw(prevState => !prevState);
     }
-
-
-    // const handleValidationRefresh = async () => {
-    //     setValidating(true)
-    //     console.log("Running the validation")
-    //     const response = await documentService.validateDocument(invoiceId);
-    //     console.log("Validation response", response);
-    //     setValidationErrors(response);
-    //     setValidating(false);
-    // }
-
+    
 
     const handleCancelEdit = () => {
         setEdit(prevState => !prevState);

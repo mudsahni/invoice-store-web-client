@@ -38,7 +38,7 @@ export const CreateNewCollection: React.FC<CreateNewCollectionProps> = ({setCrea
                     </button>
                 </div>
 
-                <p className="mt-4 text-sm text-gray-600 leading-relaxed max-w-3xl">
+                <p className="mt-4 text-sm text-gray-600 leading-relaxed ">
                     Upload and organize your documents in a collection for streamlined processing.
                     Your documents will be automatically converted into structured data,
                     enabling advanced search and filtering capabilities.

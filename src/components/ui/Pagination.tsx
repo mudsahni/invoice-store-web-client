@@ -6,13 +6,17 @@ interface TablePaginationProps {
     totalItems: number;
     itemsPerPage: number;
     onPageChange: (page: number) => void;
+    onItemsPerPageChange: (itemsPerPage: number) => void;
+    pageSizeOptions?: number[];
 }
 
 const TablePagination = ({
                              currentPage,
                              totalItems,
                              itemsPerPage,
-                             onPageChange
+                             onPageChange,
+                             onItemsPerPageChange,
+                             pageSizeOptions = [10, 25, 50, 100]
                          }: TablePaginationProps) => {
     const totalPages = Math.ceil(totalItems / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -28,6 +32,14 @@ const TablePagination = ({
         if (currentPage > 1) {
             onPageChange(currentPage - 1);
         }
+    };
+
+    // Handle page size change
+    const handlePageSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newSize = parseInt(e.target.value, 10);
+        onItemsPerPageChange(newSize);
+        // Reset to first page when changing page size
+        onPageChange(1);
     };
 
     return (
@@ -52,13 +64,31 @@ const TablePagination = ({
 
             {/* Desktop pagination */}
             <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-                <div>
+                <div className="flex items-center space-x-4">
                     <p className="text-sm text-gray-800">
                         Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
                         <span className="font-medium">{endIndex}</span> of{' '}
                         <span className="font-medium">{totalItems}</span> results
                     </p>
+
+                    {/* Page size selector */}
+                    <div className="flex items-center space-x-2">
+                        <label htmlFor="page-size" className="text-sm text-gray-600">Show</label>
+                        <select
+                            id="page-size"
+                            value={itemsPerPage}
+                            onChange={handlePageSizeChange}
+                            className="rounded-md border border-gray-300 bg-white py-1 px-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-1 focus:ring-neutral-500"
+                        >
+                            {pageSizeOptions.map(size => (
+                                <option key={size} value={size}>
+                                    {size}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
+
                 <div>
                     <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
                         <button

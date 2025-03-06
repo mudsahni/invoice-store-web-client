@@ -21,7 +21,7 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                                                                           }) => {
 
     const [currentPage, setCurrentPage] = React.useState<number>(1);
-    const itemsPerPage = 5;
+    const [itemsPerPage, setItemsPerPage] = React.useState(10);
 
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
@@ -146,6 +146,7 @@ export const YourCollectionsTable: React.FC<YourCollectionsTableProps> = ({
                             totalItems={Object.entries(collections).length}
                             itemsPerPage={itemsPerPage}
                             onPageChange={setCurrentPage}
+                            onItemsPerPageChange={setItemsPerPage}
                         />
 
                     </> :

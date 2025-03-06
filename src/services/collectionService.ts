@@ -44,18 +44,41 @@ export class CollectionsService {
     /**
      * Upload a file to a signed URL
      */
-    async uploadFile(signedUrl: string, file: File): Promise<void> {
-        const response = await fetch(signedUrl, {
-            method: 'PUT',
-            body: file,
-            headers: {
-                'Content-Type': file.type,
-            },
-        });
+    async uploadFile(signedUrl: string, file: File, maxRetries = 3): Promise<void> {
+        let attempt = 0;
+        let lastError: Error | null = null;
 
-        if (!response.ok) {
-            throw new Error(`Failed to upload file: ${response.statusText}`);
+        while (attempt < maxRetries) {
+            try {
+                const response = await fetch(signedUrl, {
+                    method: 'PUT',
+                    body: file,
+                    headers: {
+                        'Content-Type': file.type,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status} - ${response.statusText}`);
+                }
+
+                // Success! Exit the retry loop
+                return;
+            } catch (error) {
+                lastError = error instanceof Error ? error : new Error(String(error));
+                attempt++;
+
+                // If we haven't reached max retries yet, wait before trying again
+                // Use exponential backoff to increase wait time for each retry
+                if (attempt < maxRetries) {
+                    const backoffTime = 1000 * Math.pow(2, attempt - 1); // 1s, 2s, 4s, etc.
+                    await new Promise(resolve => setTimeout(resolve, backoffTime));
+                }
+            }
         }
+
+        // If we've exhausted all retries, throw the last error
+        throw new Error(`Failed to upload file after ${maxRetries} attempts: ${lastError?.message}`);
     }
 
     async subscribeToCollectionEvents(
